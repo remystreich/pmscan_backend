@@ -20,6 +20,6 @@ jobs:
         key: ${{ secrets.VPS_SSH_KEY }}
         port: 22
         script: |
-          docker pull ${{ secrets.DOCKER_USERNAME }}/my-backend:latest
-          docker-compose -f /path/to/docker-compose.yml down
-          docker-compose -f /path/to/docker-compose.yml up -d
+          docker pull ${{ secrets.DOCKER_USERNAME }}/pmscan-backend:latest
+          docker-compose -f docker-compose.yml down  # Exécution de docker-compose avec le fichier du dépôt
+          docker-compose -f docker-compose.yml up -d
