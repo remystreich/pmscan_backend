@@ -26,6 +26,7 @@ export class AppController {
       await client.connect();
       await client.query('SELECT NOW()');
       await client.end();
+      console.log('Connecté avec succès à PostgreSQL');
       return 'Connecté avec succès à PostgreSQL';
     } catch (error) {
       console.error('Erreur de connexion à PostgreSQL:', error);
