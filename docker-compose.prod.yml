@@ -1,0 +1,33 @@
+version: '3'
+
+services:
+  app:
+    image: remystreich/pmscan-backend:latest
+    ports:
+      - '3000:3000'
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgres://remystreich:2207@postgres:5432/pmscan 
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      - postgres
+      - redis
+
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: remystreich
+      POSTGRES_PASSWORD: "2207"
+      POSTGRES_DB: pmscan
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+
+  redis:
+    image: redis:7.4-alpine
+    ports:
+      - '6379:6379'
+
+volumes:
+  postgres_data:

@@ -21,5 +21,5 @@ jobs:
         port: 22
         script: |
           docker pull ${{ secrets.DOCKER_USERNAME }}/pmscan-backend:latest
-          docker-compose -f docker-compose.yml down  # Exécution de docker-compose avec le fichier du dépôt
-          docker-compose -f docker-compose.yml up -d
+          docker-compose -f /srv/backend_pmscan/docker-compose.prod.yml down
+          docker-compose -f /srv/backend_pmscan/docker-compose.prod.yml up -d
