@@ -15,8 +15,11 @@ describe('AppController', () => {
   });
 
   describe('root', () => {
-    it('should return "Hello World!"', () => {
-      expect(appController.getHello()).toBe('Hello World!');
+    it('should return status of PostgreSQL and Redis', async () => {
+      const result = await appController.getHello();
+      expect(result).toContain('Hello World!');
+      expect(result).toContain('PostgreSQL:');
+      expect(result).toContain('Redis:');
     });
   });
 });
