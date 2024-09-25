@@ -23,3 +23,4 @@ jobs:
           docker pull ${{ secrets.DOCKER_USERNAME }}/pmscan-backend:latest
           docker-compose -f /srv/backend_pmscan/docker-compose.prod.yml down
           docker-compose -f /srv/backend_pmscan/docker-compose.prod.yml up -d
+          docker image prune -f
