@@ -1,13 +1,13 @@
 import { Injectable, Inject } from '@nestjs/common';
-import { DataSource } from 'typeorm';
 import { Cache } from 'cache-manager';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { PrismaService } from './prisma/prisma.service';
 
 @Injectable()
 export class AppService {
   constructor(
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
-    private readonly dataSource: DataSource,
+    private prisma: PrismaService,
   ) {}
 
   getHello(): string {
@@ -21,11 +21,11 @@ export class AppService {
   }> {
     let dbStatus = 'ok';
     try {
-      await this.dataSource.query('SELECT 1');
+      await this.prisma.$queryRaw`SELECT 1`;
     } catch (error) {
       dbStatus = 'error: ' + error.message;
     }
-
+    //check redis
     await this.cacheManager.set('test', 'ok', 20);
     const cacheStatus = (await this.cacheManager.get('test')) as string;
 

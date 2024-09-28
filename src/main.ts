@@ -4,6 +4,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.enableCors(); //TODO: remove this in production
   app.setGlobalPrefix('api');
   const config = new DocumentBuilder()
     .setTitle('API Pmscan')

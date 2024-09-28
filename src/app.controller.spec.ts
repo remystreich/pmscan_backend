@@ -2,13 +2,13 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import { DataSource } from 'typeorm';
+import { PrismaClient } from '@prisma/client';
 
 describe('App', () => {
   let appController: AppController;
   let appService: AppService;
   let cacheManager: any;
-  let dataSource: any;
+  let prisma: any;
 
   beforeEach(async () => {
     cacheManager = {
@@ -16,8 +16,8 @@ describe('App', () => {
       set: jest.fn(),
     };
 
-    dataSource = {
-      query: jest.fn(),
+    prisma = {
+      $queryRaw: jest.fn(),
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -29,8 +29,8 @@ describe('App', () => {
           useValue: cacheManager,
         },
         {
-          provide: DataSource,
-          useValue: dataSource,
+          provide: PrismaClient,
+          useValue: prisma,
         },
       ],
     }).compile();
@@ -63,7 +63,7 @@ describe('App', () => {
     });
 
     it('should return status with postgres and cache ok', async () => {
-      dataSource.query.mockResolvedValue([]);
+      prisma.$queryRaw.mockResolvedValue([]);
       cacheManager.set.mockResolvedValue(undefined);
       cacheManager.get.mockResolvedValue('ok');
 
@@ -76,7 +76,7 @@ describe('App', () => {
     });
 
     it('should return status with postgres error', async () => {
-      dataSource.query.mockRejectedValue(new Error('DB error'));
+      prisma.$queryRaw.mockRejectedValue(new Error('DB error'));
       cacheManager.set.mockResolvedValue(undefined);
       cacheManager.get.mockResolvedValue('ok');
 
@@ -89,7 +89,7 @@ describe('App', () => {
     });
 
     it('should return status with cache error', async () => {
-      dataSource.query.mockResolvedValue([]);
+      prisma.$queryRaw.mockResolvedValue([]);
       cacheManager.set.mockResolvedValue(undefined);
       cacheManager.get.mockResolvedValue(null);
 
