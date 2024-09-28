@@ -15,12 +15,8 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    # - name: Build Docker image
-    #   run: docker build . -t ${{ secrets.DOCKER_USERNAME }}/pmscan-backend:latest
-
     - name: Build Docker image
-      run: docker build . -t ${{ secrets.DOCKER_USERNAME }}/pmscan-backend:${{ github.sha }} -t ${{ secrets.DOCKER_USERNAME }}/pmscan-backend:latest
-    
+      run: docker build . -t ${{ secrets.DOCKER_USERNAME }}/pmscan-backend:latest
 
     - name: Log in to Docker Hub
       uses: docker/login-action@v2
@@ -28,8 +24,5 @@ jobs:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
 
-    # - name: Push Docker image
-    #   run: docker push ${{ secrets.DOCKER_USERNAME }}/pmscan-backend:latest
-    - name: Push specific tag (commit SHA)
-      run: docker push ${{ secrets.DOCKER_USERNAME }}/pmscan-backend:${{ github.sha }}
-
+    - name: Push Docker image
+      run: docker push ${{ secrets.DOCKER_USERNAME }}/pmscan-backend:latest

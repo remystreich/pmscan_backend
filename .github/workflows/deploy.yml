@@ -20,16 +20,7 @@ jobs:
         key: ${{ secrets.VPS_SSH_KEY }}
         port: 22
         script: |
-          echo "Pulling the latest Docker image..."
-          docker pull ${{ secrets.DOCKER_USERNAME }}/pmscan-backend:${{ github.sha }}
-
-          echo "Shutting down existing containers..."
+          docker pull ${{ secrets.DOCKER_USERNAME }}/pmscan-backend:latest
           docker-compose -f /srv/backend_pmscan/docker-compose.prod.yml down
-
-          echo "Starting new containers..."
           docker-compose -f /srv/backend_pmscan/docker-compose.prod.yml up -d
-
-          echo "Cleaning up unused Docker images..."
           docker image prune -f
-
-          echo "Deployment completed."
