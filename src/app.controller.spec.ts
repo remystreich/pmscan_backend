@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import { PrismaClient } from '@prisma/client';
+import { PrismaService } from './prisma/prisma.service';
 
 describe('App', () => {
   let appController: AppController;
@@ -29,7 +29,7 @@ describe('App', () => {
           useValue: cacheManager,
         },
         {
-          provide: PrismaClient,
+          provide: PrismaService,
           useValue: prisma,
         },
       ],
