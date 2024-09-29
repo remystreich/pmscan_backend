@@ -4,6 +4,9 @@ import { AppService } from './app.service';
 import { CacheModule } from '@nestjs/cache-manager';
 import { redisStore } from 'cache-manager-redis-yet';
 import { PrismaService } from './prisma/prisma.service';
+import { AuthModule } from './auth/auth.module';
+import { UsersModule } from './users/users.module';
+import { PrismaModule } from './prisma/prisma.module';
 
 @Module({
   imports: [
@@ -18,6 +21,9 @@ import { PrismaService } from './prisma/prisma.service';
         }),
       }),
     }),
+    AuthModule,
+    UsersModule,
+    PrismaModule,
   ],
   controllers: [AppController],
   providers: [AppService, PrismaService],
