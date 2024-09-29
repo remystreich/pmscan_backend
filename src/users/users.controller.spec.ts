@@ -40,7 +40,14 @@ describe('UsersController', () => {
         email: 'test@example.com',
         password: 'Password123!',
       };
-      const expectedResult = { id: 1, ...createUserDto };
+      const expectedResult = {
+        email: 'test@example.com',
+        password: 'password123',
+        name: 'Test User',
+        id: 1,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
       jest.spyOn(service, 'create').mockResolvedValue(expectedResult);
 
       expect(await controller.create(createUserDto)).toBe(expectedResult);
@@ -50,20 +57,34 @@ describe('UsersController', () => {
 
   describe('findAll', () => {
     it('should return an array of users', async () => {
-      const expectedResult = [{ id: 1, name: 'Test User' }];
-      jest.spyOn(service, 'findAll').mockResolvedValue(expectedResult);
+      const expectedResults = [
+        {
+          id: 1,
+          name: 'Test User',
+          email: 'test@example.com',
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+      ];
+      jest.spyOn(service, 'findAll').mockResolvedValue(expectedResults);
 
-      expect(await controller.findAll()).toBe(expectedResult);
+      expect(await controller.findAll()).toBe(expectedResults);
       expect(service.findAll).toHaveBeenCalled();
     });
   });
 
   describe('findOne', () => {
     it('should return a single user', async () => {
-      const expectedResult = { id: 1, name: 'Test User' };
-      jest.spyOn(service, 'findOne').mockResolvedValue(expectedResult);
+      const expectedOneResult = {
+        id: 1,
+        name: 'Test User',
+        email: 'test@example.com',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+      jest.spyOn(service, 'findOne').mockResolvedValue(expectedOneResult);
 
-      expect(await controller.findOne('1')).toBe(expectedResult);
+      expect(await controller.findOne('1')).toBe(expectedOneResult);
       expect(service.findOne).toHaveBeenCalledWith(1);
     });
   });
@@ -71,10 +92,18 @@ describe('UsersController', () => {
   describe('update', () => {
     it('should update a user', async () => {
       const updateUserDto: UpdateUserDto = { name: 'Updated User' };
-      const expectedResult = { id: 1, ...updateUserDto };
-      jest.spyOn(service, 'update').mockResolvedValue(expectedResult);
+      const expectedUpdateResult = {
+        id: 1,
+        name: 'Updated User',
+        email: 'updated@example.com',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+      jest.spyOn(service, 'update').mockResolvedValue(expectedUpdateResult);
 
-      expect(await controller.update('1', updateUserDto)).toBe(expectedResult);
+      expect(await controller.update('1', updateUserDto)).toBe(
+        expectedUpdateResult,
+      );
       expect(service.update).toHaveBeenCalledWith(1, updateUserDto);
     });
   });
