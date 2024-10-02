@@ -12,18 +12,73 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: myuser
+          POSTGRES_PASSWORD: mypassword
+          POSTGRES_DB: mydatabase
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U myuser" 
+          --health-interval=10s 
+          --health-timeout=5s 
+          --health-retries=5
+
+      redis:
+        image: redis:7.4-alpine
+        ports:
+          - 6379:6379
+
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      # Étape 1: Checker le code
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-    - name: Set up Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20.17'
+      # Étape 2: Installer Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20.17
 
-    - name: Install dependencies
-      run: npm install
+      # Étape 3: Installer les dépendances
+      - name: Install dependencies
+        run: npm install
 
-    - name: Run tests
-      run: npm run test
-      continue-on-error: false 
+      # Étape 4: Attendre que PostgreSQL soit prêt
+      - name: Wait for PostgreSQL to be ready
+        run: |
+          until pg_isready -h localhost -p 5432 -U myuser; do
+            echo "Waiting for postgres..."
+            sleep 5
+          done
+
+      # Étape 5: Créer la base de données pour les tests
+      - name: Create test database
+        run: |
+          PGPASSWORD=mypassword psql -h localhost -U myuser -d mydatabase -c "CREATE DATABASE testdb;"
+
+      # Étape 6: Appliquer les migrations Prisma
+      - name: Run Prisma migrations
+        env:
+          DATABASE_URL: postgresql://myuser:mypassword@localhost:5432/testdb?schema=public
+        run: npx prisma migrate deploy
+
+      # Étape 7: Exécuter les tests
+      - name: Run tests
+        env:
+          NODE_ENV: test
+          DATABASE_URL: postgresql://myuser:mypassword@localhost:5432/testdb?schema=public
+          POSTGRES_USER: myuser
+          POSTGRES_PASSWORD: mypassword
+          POSTGRES_DB: testdb
+          REDIS_HOST: localhost
+          REDIS_PORT: 6379
+        run: npm run test_workflow
+
+      # (Optionnel) Étape 8: Nettoyer la base de données après les tests
+      - name: Drop test database
+        run: |
+          PGPASSWORD=mypassword psql -h localhost -U myuser -d mydatabase -c "DROP DATABASE IF EXISTS testdb;"
