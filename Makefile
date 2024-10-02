@@ -16,6 +16,7 @@ studio:
 migrate:
 	docker-compose exec app sh -c "npx prisma migrate dev --name $(name)"
 
-
+tests:
+	
 
 
