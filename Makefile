@@ -24,6 +24,5 @@ create-test-db:
 	docker-compose exec app sh -c "DATABASE_URL=\postgresql://myuser:mypassword@postgres:5432/testdb npx prisma migrate deploy"
 
 migrate-test-db:
-	# docker-compose exec app sh -c "npx dotenv -e .env.test -- npx prisma migrate deploy"
 	docker-compose exec app sh -c "DATABASE_URL=\postgresql://myuser:mypassword@postgres:5432/testdb npx prisma migrate deploy"
 
