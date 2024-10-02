@@ -44,6 +44,13 @@ describe('App', () => {
       expect(appController.getHello()).toBe('Hello World!');
     });
 
+    it('should log environment variables', () => {
+      console.log('DATABASE_URL:', process.env.DATABASE_URL);
+      console.log('POSTGRES_USER:', process.env.POSTGRES_USER);
+      console.log('POSTGRES_PASSWORD:', process.env.POSTGRES_PASSWORD);
+      console.log('POSTGRES_DB:', process.env.POSTGRES_DB);
+    });
+
     it('should return status', async () => {
       const mockStatus = {
         status: 'Application running',

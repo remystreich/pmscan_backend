@@ -1,5 +1,5 @@
 commit:
-	npm run test
+	docker-compose exec -e DATABASE_URL="postgresql://myuser:mypassword@postgres:5432/testdb" app sh -c "npx prisma migrate deploy && npm run test"
 	git add .
 	git commit -m "$(c)"
 	git push
@@ -17,6 +17,13 @@ migrate:
 	docker-compose exec app sh -c "npx prisma migrate dev --name $(name)"
 
 tests:
-	
+	docker-compose exec -e DATABASE_URL="postgresql://myuser:mypassword@postgres:5432/testdb" app sh -c "npx prisma migrate deploy && npm run test"
 
+create-test-db:
+	docker-compose exec postgres sh -c "psql -U myuser -d mydb -c 'CREATE DATABASE testdb;'"
+	docker-compose exec app sh -c "DATABASE_URL=\postgresql://myuser:mypassword@postgres:5432/testdb npx prisma migrate deploy"
+
+migrate-test-db:
+	# docker-compose exec app sh -c "npx dotenv -e .env.test -- npx prisma migrate deploy"
+	docker-compose exec app sh -c "DATABASE_URL=\postgresql://myuser:mypassword@postgres:5432/testdb npx prisma migrate deploy"
 
