@@ -76,6 +76,7 @@ jobs:
           POSTGRES_DB: testdb
           REDIS_HOST: localhost
           REDIS_PORT: 6379
+          JWT_SECRET: 0602d6b5abc49a2a7d65c2739dfdad2f966c5fe71754d8d741940f71331cb4320602d6b5abc49a2a7d65c2739dfdad2f966c5fe71754d8d741940f71331cb432
         run: npm run test
 
       # (Optionnel) Étape 8: Nettoyer la base de données après les tests
