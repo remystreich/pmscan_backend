@@ -3,6 +3,7 @@ import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { AppModule } from './../app.module';
 import { PrismaService } from './../prisma/prisma.service';
+import { useContainer } from 'class-validator'; // Importer useContainer
 
 describe('UsersController (e2e)', () => {
   let app: INestApplication;
@@ -14,6 +15,10 @@ describe('UsersController (e2e)', () => {
     }).compile();
 
     app = moduleFixture.createNestApplication();
+
+    // Appeler useContainer pour permettre l'injection dans les validateurs pendant les tests
+    useContainer(app.select(AppModule), { fallbackOnErrors: true });
+
     await app.init();
 
     prismaService = app.get<PrismaService>(PrismaService);
@@ -50,6 +55,4 @@ describe('UsersController (e2e)', () => {
     expect(createdUser).toBeTruthy();
     expect(createdUser.email).toBe(createUserDto.email);
   });
-
-  // Vous pouvez ajouter d'autres tests pour les autres endpoints (GET, PATCH, DELETE) ici
 });

@@ -6,6 +6,7 @@ import {
   MinLength,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { IsEmailUnique } from '../../prisma/isEmailUniqueConstraint.validator';
 
 export class CreateUserDto {
   @ApiProperty({
@@ -14,6 +15,7 @@ export class CreateUserDto {
   })
   @IsEmail()
   @IsNotEmpty()
+  @IsEmailUnique()
   email: string;
 
   @ApiProperty({

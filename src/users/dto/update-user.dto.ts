@@ -8,6 +8,7 @@ import {
   MinLength,
   IsOptional,
 } from 'class-validator';
+import { IsEmailUnique } from '../../prisma/isEmailUniqueConstraint.validator';
 
 export class UpdateUserDto extends PartialType(CreateUserDto) {
   @ApiProperty({
@@ -17,6 +18,7 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
   })
   @IsEmail()
   @IsOptional()
+  @IsEmailUnique()
   email?: string;
 
   @ApiProperty({
