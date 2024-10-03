@@ -3,11 +3,15 @@ import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { AppModule } from './../app.module';
 import { PrismaService } from './../prisma/prisma.service';
-import { useContainer } from 'class-validator'; // Importer useContainer
+import { useContainer } from 'class-validator';
+import { AuthService } from '../auth/auth.service';
+import * as bcrypt from 'bcrypt';
 
-describe('UsersController (e2e)', () => {
+describe('UsersController', () => {
   let app: INestApplication;
   let prismaService: PrismaService;
+  let authService: AuthService;
+  let jwtToken: string;
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -15,32 +19,47 @@ describe('UsersController (e2e)', () => {
     }).compile();
 
     app = moduleFixture.createNestApplication();
-
-    // Appeler useContainer pour permettre l'injection dans les validateurs pendant les tests
     useContainer(app.select(AppModule), { fallbackOnErrors: true });
-
     await app.init();
 
     prismaService = app.get<PrismaService>(PrismaService);
+    authService = app.get<AuthService>(AuthService);
+
     await prismaService.user.deleteMany();
+
+    // Créer un utilisateur de test avec un mot de passe hashé
+    const hashedPassword = await bcrypt.hash('password123', 10);
+    const testUser = await prismaService.user.create({
+      data: {
+        email: 'testuser@example.com',
+        password: hashedPassword,
+        name: 'Test User',
+      },
+    });
+
+    // Obtenir un token JWT
+    const { access_token } = await authService.login({
+      email: testUser.email,
+      password: 'password123',
+    });
+    jwtToken = access_token;
   });
 
   afterAll(async () => {
-    if (prismaService) {
-      await prismaService.user.deleteMany();
-    }
+    await prismaService.user.deleteMany();
     await app.close();
   });
 
   it('/users (POST) - should create a new user', async () => {
     const createUserDto = {
-      email: 'test@example.com',
+      email: 'testcreate@example.com',
       password: 'Password123!',
       name: 'Test User',
     };
 
     const response = await request(app.getHttpServer())
       .post('/users')
+      .set('Authorization', `Bearer ${jwtToken}`)
       .send(createUserDto)
       .expect(201);
 
