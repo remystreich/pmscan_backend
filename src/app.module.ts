@@ -8,6 +8,7 @@ import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { ConfigModule } from '@nestjs/config';
+import { RefreshTokensModule } from './refresh-tokens/refresh-tokens.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -21,12 +22,14 @@ import { ConfigModule } from '@nestjs/config';
             host: process.env.REDIS_HOST || 'redis',
             port: parseInt(process.env.REDIS_PORT || '6379'),
           },
+          password: process.env.REDIS_PASSWORD,
         }),
       }),
     }),
     AuthModule,
     UsersModule,
     PrismaModule,
+    RefreshTokensModule,
   ],
   controllers: [AppController],
   providers: [AppService, PrismaService],

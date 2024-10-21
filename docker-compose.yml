@@ -37,8 +37,9 @@ services:
     image: redis:7.4-alpine
     volumes:
       - redis_data:/data
-    ports:
-      - '6379:6379'
+    command: redis-server --requirepass ${REDIS_PASSWORD}
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
 
 volumes:
   postgres_data:
