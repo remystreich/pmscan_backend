@@ -35,4 +35,17 @@ model PMScan {
 
   userId    Int
   user      User     @relation(fields: [userId], references: [id])
+
+  records Record[]
+}
+
+model Record {
+  id        Int      @default(autoincrement()) @id
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  data      Bytes
+  name      String?
+
+  pmScanId Int
+  pmScan    PMScan @relation(fields: [pmScanId], references: [id])
 }
