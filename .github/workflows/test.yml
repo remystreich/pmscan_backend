@@ -28,9 +28,16 @@ jobs:
           --health-retries=5
 
       redis:
-        image: redis:7.4-alpine
+        image: bitnami/redis:latest
         ports:
           - 6379:6379
+        env:
+          REDIS_PASSWORD: myredispasswordfortests
+        options: >-
+          --health-cmd "redis-cli -a ${REDIS_PASSWORD} ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
 
     steps:
       # Étape 1: Checker le code
@@ -76,6 +83,7 @@ jobs:
           POSTGRES_DB: testdb
           REDIS_HOST: localhost
           REDIS_PORT: 6379
+          REDIS_PASSWORD: myredispasswordfortests
           JWT_SECRET: 0602d6b5abc49a2a7d65c2739dfdad2f966c5fe71754d8d741940f71331cb4320602d6b5abc49a2a7d65c2739dfdad2f966c5fe71754d8d741940f71331cb432
         run: npm run test
 
