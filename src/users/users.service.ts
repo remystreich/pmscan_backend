@@ -1,20 +1,18 @@
 import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { PrismaService } from '../prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
+import { UsersRepository } from './users.repository';
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly usersRepository: UsersRepository) {}
 
   async create(createUserDto: CreateUserDto) {
     const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
-    const user = await this.prisma.user.create({
-      data: {
-        ...createUserDto,
-        password: hashedPassword,
-      },
+    const user = await this.usersRepository.create({
+      ...createUserDto,
+      password: hashedPassword,
     });
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password, ...result } = user;
@@ -22,13 +20,23 @@ export class UsersService {
   }
 
   async findAll() {
-    const users = await this.prisma.user.findMany();
+    const users = await this.usersRepository.findAll();
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     return users.map(({ password, ...user }) => user);
   }
 
   async findOne(id: number) {
-    const user = await this.prisma.user.findUnique({ where: { id } });
+    const user = await this.usersRepository.findOne(id);
+    if (user) {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { password, ...result } = user;
+      return result;
+    }
+    return null;
+  }
+
+  async findOneByEmail(email: string) {
+    const user = await this.usersRepository.findOneByEmail(email);
     if (user) {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { password, ...result } = user;
@@ -44,10 +52,7 @@ export class UsersService {
       updateData.password = await bcrypt.hash(updateData.password, 10);
     }
 
-    const updatedUser = await this.prisma.user.update({
-      where: { id },
-      data: updateData,
-    });
+    const updatedUser = await this.usersRepository.update(id, updateData);
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password, ...result } = updatedUser;
@@ -55,7 +60,7 @@ export class UsersService {
   }
 
   async remove(id: number) {
-    await this.prisma.user.delete({ where: { id } });
+    await this.usersRepository.delete(id);
     return { message: 'Utilisateur supprimé avec succès' };
   }
 }
