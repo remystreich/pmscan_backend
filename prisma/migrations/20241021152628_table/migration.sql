@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "PMScan" ALTER COLUMN "name" DROP NOT NULL;
