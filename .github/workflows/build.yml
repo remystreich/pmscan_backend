@@ -2,7 +2,9 @@ name: Build Docker Image
 
 on:
   workflow_run:
-    workflows: ["Run Tests"]  # Ce workflow se déclenche après le workflow "Run Tests"
+    workflows: ["Run Tests"]
+    branches:
+      - main
     types:
       - completed
 
