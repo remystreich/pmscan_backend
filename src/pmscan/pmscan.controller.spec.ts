@@ -9,6 +9,8 @@ import { User } from '@prisma/client';
 describe('PmscanController', () => {
   let controller: PmscanController;
   let service: PmscanService;
+  let mockUser: User;
+  let mockPmscan;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -32,121 +34,84 @@ describe('PmscanController', () => {
 
     controller = module.get<PmscanController>(PmscanController);
     service = module.get<PmscanService>(PmscanService);
+
+    mockUser = {
+      id: 1,
+      name: 'Test User',
+      email: 'test@example.com',
+      password: 'password',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    mockPmscan = {
+      id: 1,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      display: Buffer.from('test'),
+      name: 'Test PMScan',
+      deviceId: 'FF:9C:95:3E:A9:F9',
+      deviceName: 'PMScan123456',
+      userId: 1,
+    };
   });
 
   it('should be defined', () => {
     expect(controller).toBeDefined();
   });
 
-  const user: User = {
-    id: 1,
-    name: 'Test User',
-    email: 'test@example.com',
-    password: 'password',
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  };
-
-  describe('create', () => {
+  describe('CRUD operations', () => {
     it('should create a pmscan', async () => {
       const createPmscanDto: CreatePmscanDto = {
         name: 'Test PMScan',
         deviceId: 'FF:9C:95:3E:A9:F9',
         deviceName: 'PMScan123456',
         display: 'base64encodedstring',
-        userId: 1,
       };
-      const expectedResult = {
-        id: 1,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        display: Buffer.from(createPmscanDto.display, 'base64'),
-        name: 'Test PMScan',
-        deviceId: 'FF:9C:95:3E:A9:F9',
-        deviceName: 'PMScan123456',
-        userId: 1,
-      };
-      jest.spyOn(service, 'create').mockResolvedValue(expectedResult);
+      jest.spyOn(service, 'create').mockResolvedValue(mockPmscan);
 
-      expect(await controller.create(createPmscanDto, user)).toBe(
-        expectedResult,
-      );
-      expect(service.create).toHaveBeenCalledWith(createPmscanDto, user.id);
+      const result = await controller.create(createPmscanDto, mockUser);
+      expect(result).toEqual(mockPmscan);
+      expect(service.create).toHaveBeenCalledWith(createPmscanDto, mockUser.id);
     });
-  });
 
-  describe('findOne', () => {
     it('should find a pmscan by id', async () => {
-      const id = '1';
-      const expectedResult = {
-        id: 1,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        display: Buffer.from('test'),
-        name: 'Test PMScan',
-        deviceId: 'FF:9C:95:3E:A9:F9',
-        deviceName: 'PMScan123456',
-        userId: 1,
-      };
-      jest.spyOn(service, 'findOne').mockResolvedValue(expectedResult);
+      jest.spyOn(service, 'findOne').mockResolvedValue(mockPmscan);
 
-      expect(await controller.findOne(id, user)).toBe(expectedResult);
-      expect(service.findOne).toHaveBeenCalledWith(1, user.id);
+      const result = await controller.findOne('1', mockUser);
+      expect(result).toEqual(mockPmscan);
+      expect(service.findOne).toHaveBeenCalledWith(1, mockUser.id);
     });
-  });
 
-  describe('update', () => {
     it('should update a pmscan', async () => {
-      const id = '1';
       const updatePmscanDto: UpdatePmscanDto = { name: 'Updated PMScan' };
-      const expectedResult = {
-        id: 1,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        name: 'Updated PMScan',
-        display: Buffer.from('test'),
-        deviceId: 'FF:9C:95:3E:A9:F9',
-        deviceName: 'PMScan123456',
-        userId: 1,
-      };
-      jest.spyOn(service, 'update').mockResolvedValue(expectedResult);
+      const updatedMockPmscan = { ...mockPmscan, name: 'Updated PMScan' };
+      jest.spyOn(service, 'update').mockResolvedValue(updatedMockPmscan);
 
-      expect(await controller.update(id, updatePmscanDto, user)).toBe(
-        expectedResult,
+      const result = await controller.update('1', updatePmscanDto, mockUser);
+      expect(result).toEqual(updatedMockPmscan);
+      expect(service.update).toHaveBeenCalledWith(
+        1,
+        updatePmscanDto,
+        mockUser.id,
       );
-      expect(service.update).toHaveBeenCalledWith(1, updatePmscanDto, user.id);
     });
-  });
 
-  describe('remove', () => {
     it('should remove a pmscan', async () => {
-      const id = '1';
       const expectedResult = { message: 'PMScan supprimé avec succès' };
       jest.spyOn(service, 'remove').mockResolvedValue(expectedResult);
 
-      expect(await controller.remove(id, user)).toBe(expectedResult);
-      expect(service.remove).toHaveBeenCalledWith(1, user.id);
+      const result = await controller.remove('1', mockUser);
+      expect(result).toEqual(expectedResult);
+      expect(service.remove).toHaveBeenCalledWith(1, mockUser.id);
     });
-  });
 
-  describe('findAllFromUser', () => {
     it('should find all pmscans for a user', async () => {
-      const expectedResult = [
-        {
-          id: 1,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-          display: Buffer.from('test'),
-          name: 'Test PMScan',
-          deviceId: 'FF:9C:95:3E:A9:F9',
-          deviceName: 'PMScan123456',
-          userId: 1,
-        },
-      ];
-      jest.spyOn(service, 'findAllFromUser').mockResolvedValue(expectedResult);
+      jest.spyOn(service, 'findAllFromUser').mockResolvedValue([mockPmscan]);
 
-      expect(await controller.findAllFromUser(user)).toBe(expectedResult);
-      expect(service.findAllFromUser).toHaveBeenCalledWith(user.id);
+      const result = await controller.findAllFromUser(mockUser);
+      expect(result).toEqual([mockPmscan]);
+      expect(service.findAllFromUser).toHaveBeenCalledWith(mockUser.id);
     });
   });
 });

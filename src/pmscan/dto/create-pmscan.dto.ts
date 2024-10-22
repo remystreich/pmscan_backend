@@ -1,10 +1,4 @@
-import {
-  IsString,
-  IsNotEmpty,
-  Matches,
-  IsNumber,
-  IsOptional,
-} from 'class-validator';
+import { IsString, IsNotEmpty, Matches, IsOptional } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreatePmscanDto {
@@ -46,12 +40,4 @@ export class CreatePmscanDto {
   @IsNotEmpty()
   @IsString()
   display: string;
-
-  @ApiProperty({
-    description: 'The ID of the user who owns this PMScan',
-    example: 1,
-  })
-  @IsNotEmpty()
-  @IsNumber()
-  userId: number;
 }
