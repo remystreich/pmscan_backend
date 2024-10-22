@@ -61,6 +61,6 @@ export class UsersService {
 
   async remove(id: number) {
     await this.usersRepository.delete(id);
-    return { message: 'Utilisateur supprimé avec succès' };
+    return { message: 'User deleted successfully' };
   }
 }

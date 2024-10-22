@@ -8,5 +8,6 @@ import { UsersModule } from '../users/users.module';
   controllers: [PmscanController],
   providers: [PmscanService, PmscanRepository],
   imports: [UsersModule],
+  exports: [PmscanService],
 })
 export class PmscanModule {}

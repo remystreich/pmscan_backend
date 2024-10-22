@@ -10,6 +10,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { ConfigModule } from '@nestjs/config';
 import { RefreshTokensModule } from './refresh-tokens/refresh-tokens.module';
 import { PmscanModule } from './pmscan/pmscan.module';
+import { RecordsModule } from './records/records.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -32,6 +33,7 @@ import { PmscanModule } from './pmscan/pmscan.module';
     PrismaModule,
     RefreshTokensModule,
     PmscanModule,
+    RecordsModule,
   ],
   controllers: [AppController],
   providers: [AppService, PrismaService],

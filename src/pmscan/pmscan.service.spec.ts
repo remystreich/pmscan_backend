@@ -10,6 +10,9 @@ describe('PmscanService', () => {
   let service: PmscanService;
   let pmscanRepository: PmscanRepository;
   let usersService: UsersService;
+  let mockUser: User;
+  let mockCreatePmscanDto: CreatePmscanDto;
+  let mockCreatedPmscan: PMScan;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -17,15 +20,11 @@ describe('PmscanService', () => {
         PmscanService,
         {
           provide: PmscanRepository,
-          useValue: {
-            create: jest.fn(),
-          },
+          useValue: { create: jest.fn() },
         },
         {
           provide: UsersService,
-          useValue: {
-            findOne: jest.fn(),
-          },
+          useValue: { findOne: jest.fn() },
         },
       ],
     }).compile();
@@ -33,73 +32,66 @@ describe('PmscanService', () => {
     service = module.get<PmscanService>(PmscanService);
     pmscanRepository = module.get<PmscanRepository>(PmscanRepository);
     usersService = module.get<UsersService>(UsersService);
+
+    mockUser = {
+      id: 1,
+      name: 'Test User',
+      email: 'test@example.com',
+      password: 'hashedpassword',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    mockCreatePmscanDto = {
+      name: 'Test PMScan',
+      deviceId: 'device123',
+      deviceName: 'TestDevice',
+      display: 'base64encodedstring',
+    };
+
+    mockCreatedPmscan = {
+      id: 1,
+      name: mockCreatePmscanDto.name,
+      deviceId: mockCreatePmscanDto.deviceId,
+      deviceName: mockCreatePmscanDto.deviceName,
+      display: Buffer.from(mockCreatePmscanDto.display, 'base64'),
+      userId: mockUser.id,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
   });
 
   it('should be defined', () => {
     expect(service).toBeDefined();
   });
 
-  const user: User = {
-    id: 1,
-    name: 'Test User',
-    email: 'test@example.com',
-    password: 'hashedpassword',
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  };
-
   describe('create', () => {
     it('should create a new pmscan', async () => {
-      const createPmscanDto: CreatePmscanDto = {
-        name: 'Test PMScan',
-        deviceId: 'device123',
-        deviceName: 'TestDevice',
-        display: 'base64encodedstring',
-        userId: 1,
-      };
+      jest.spyOn(usersService, 'findOne').mockResolvedValue(mockUser);
+      jest
+        .spyOn(pmscanRepository, 'create')
+        .mockResolvedValue(mockCreatedPmscan);
 
-      const createdPmscan: PMScan = {
-        id: 1,
-        name: createPmscanDto.name,
-        deviceId: createPmscanDto.deviceId,
-        deviceName: createPmscanDto.deviceName,
-        display: Buffer.from(createPmscanDto.display, 'base64'),
-        userId: user.id,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
+      const result = await service.create(mockCreatePmscanDto, mockUser.id);
 
-      jest.spyOn(usersService, 'findOne').mockResolvedValue(user);
-      jest.spyOn(pmscanRepository, 'create').mockResolvedValue(createdPmscan);
-
-      const result = await service.create(createPmscanDto, user.id);
-
-      expect(usersService.findOne).toHaveBeenCalledWith(user.id);
+      expect(usersService.findOne).toHaveBeenCalledWith(mockUser.id);
       expect(pmscanRepository.create).toHaveBeenCalledWith({
-        name: createPmscanDto.name,
-        deviceId: createPmscanDto.deviceId,
-        deviceName: createPmscanDto.deviceName,
-        display: Buffer.from(createPmscanDto.display, 'base64'),
-        user: { connect: { id: user.id } },
+        name: mockCreatePmscanDto.name,
+        deviceId: mockCreatePmscanDto.deviceId,
+        deviceName: mockCreatePmscanDto.deviceName,
+        display: Buffer.from(mockCreatePmscanDto.display, 'base64'),
+        user: { connect: { id: mockUser.id } },
       });
-      expect(result).toEqual(createdPmscan);
+      expect(result).toEqual(mockCreatedPmscan);
     });
 
     it('should throw NotFoundException if user is not found', async () => {
-      const createPmscanDto: CreatePmscanDto = {
-        name: 'Test PMScan',
-        deviceId: 'device123',
-        deviceName: 'TestDevice',
-        display: 'base64encodedstring',
-        userId: 1,
-      };
-
       jest.spyOn(usersService, 'findOne').mockResolvedValue(null);
 
-      await expect(service.create(createPmscanDto, user.id)).rejects.toThrow(
-        NotFoundException,
-      );
-      expect(usersService.findOne).toHaveBeenCalledWith(user.id);
+      await expect(
+        service.create(mockCreatePmscanDto, mockUser.id),
+      ).rejects.toThrow(NotFoundException);
+      expect(usersService.findOne).toHaveBeenCalledWith(mockUser.id);
       expect(pmscanRepository.create).not.toHaveBeenCalled();
     });
   });
