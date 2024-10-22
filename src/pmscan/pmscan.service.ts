@@ -17,6 +17,7 @@ export class PmscanService {
   ) {}
 
   async create(createPmscanDto: CreatePmscanDto, userId: number) {
+    console.log(userId);
     const user = await this.usersService.findOne(userId);
     if (!user) {
       throw new NotFoundException('User not found');
