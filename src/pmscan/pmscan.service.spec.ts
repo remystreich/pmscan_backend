@@ -39,6 +39,15 @@ describe('PmscanService', () => {
     expect(service).toBeDefined();
   });
 
+  const user: User = {
+    id: 1,
+    name: 'Test User',
+    email: 'test@example.com',
+    password: 'hashedpassword',
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  };
+
   describe('create', () => {
     it('should create a new pmscan', async () => {
       const createPmscanDto: CreatePmscanDto = {
@@ -49,22 +58,13 @@ describe('PmscanService', () => {
         userId: 1,
       };
 
-      const user: User = {
-        id: 1,
-        name: 'Test User',
-        email: 'test@example.com',
-        password: 'hashedpassword',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
-
       const createdPmscan: PMScan = {
         id: 1,
         name: createPmscanDto.name,
         deviceId: createPmscanDto.deviceId,
         deviceName: createPmscanDto.deviceName,
         display: Buffer.from(createPmscanDto.display, 'base64'),
-        userId: createPmscanDto.userId,
+        userId: user.id,
         createdAt: new Date(),
         updatedAt: new Date(),
       };
@@ -72,15 +72,15 @@ describe('PmscanService', () => {
       jest.spyOn(usersService, 'findOne').mockResolvedValue(user);
       jest.spyOn(pmscanRepository, 'create').mockResolvedValue(createdPmscan);
 
-      const result = await service.create(createPmscanDto);
+      const result = await service.create(createPmscanDto, user.id);
 
-      expect(usersService.findOne).toHaveBeenCalledWith(createPmscanDto.userId);
+      expect(usersService.findOne).toHaveBeenCalledWith(user.id);
       expect(pmscanRepository.create).toHaveBeenCalledWith({
         name: createPmscanDto.name,
         deviceId: createPmscanDto.deviceId,
         deviceName: createPmscanDto.deviceName,
         display: Buffer.from(createPmscanDto.display, 'base64'),
-        user: { connect: { id: createPmscanDto.userId } },
+        user: { connect: { id: user.id } },
       });
       expect(result).toEqual(createdPmscan);
     });
@@ -96,10 +96,10 @@ describe('PmscanService', () => {
 
       jest.spyOn(usersService, 'findOne').mockResolvedValue(null);
 
-      await expect(service.create(createPmscanDto)).rejects.toThrow(
+      await expect(service.create(createPmscanDto, user.id)).rejects.toThrow(
         NotFoundException,
       );
-      expect(usersService.findOne).toHaveBeenCalledWith(createPmscanDto.userId);
+      expect(usersService.findOne).toHaveBeenCalledWith(user.id);
       expect(pmscanRepository.create).not.toHaveBeenCalled();
     });
   });

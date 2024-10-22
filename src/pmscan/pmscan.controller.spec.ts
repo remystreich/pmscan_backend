@@ -4,6 +4,7 @@ import { PmscanService } from './pmscan.service';
 import { CreatePmscanDto } from './dto/create-pmscan.dto';
 import { UpdatePmscanDto } from './dto/update-pmscan.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { User } from '@prisma/client';
 
 describe('PmscanController', () => {
   let controller: PmscanController;
@@ -20,6 +21,7 @@ describe('PmscanController', () => {
             findOne: jest.fn(),
             update: jest.fn(),
             remove: jest.fn(),
+            findAllFromUser: jest.fn(),
           },
         },
       ],
@@ -35,6 +37,15 @@ describe('PmscanController', () => {
   it('should be defined', () => {
     expect(controller).toBeDefined();
   });
+
+  const user: User = {
+    id: 1,
+    name: 'Test User',
+    email: 'test@example.com',
+    password: 'password',
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  };
 
   describe('create', () => {
     it('should create a pmscan', async () => {
@@ -57,8 +68,10 @@ describe('PmscanController', () => {
       };
       jest.spyOn(service, 'create').mockResolvedValue(expectedResult);
 
-      expect(await controller.create(createPmscanDto)).toBe(expectedResult);
-      expect(service.create).toHaveBeenCalledWith(createPmscanDto);
+      expect(await controller.create(createPmscanDto, user)).toBe(
+        expectedResult,
+      );
+      expect(service.create).toHaveBeenCalledWith(createPmscanDto, user.id);
     });
   });
 
@@ -77,8 +90,8 @@ describe('PmscanController', () => {
       };
       jest.spyOn(service, 'findOne').mockResolvedValue(expectedResult);
 
-      expect(await controller.findOne(id)).toBe(expectedResult);
-      expect(service.findOne).toHaveBeenCalledWith(1);
+      expect(await controller.findOne(id, user)).toBe(expectedResult);
+      expect(service.findOne).toHaveBeenCalledWith(1, user.id);
     });
   });
 
@@ -98,8 +111,10 @@ describe('PmscanController', () => {
       };
       jest.spyOn(service, 'update').mockResolvedValue(expectedResult);
 
-      expect(await controller.update(id, updatePmscanDto)).toBe(expectedResult);
-      expect(service.update).toHaveBeenCalledWith(1, updatePmscanDto);
+      expect(await controller.update(id, updatePmscanDto, user)).toBe(
+        expectedResult,
+      );
+      expect(service.update).toHaveBeenCalledWith(1, updatePmscanDto, user.id);
     });
   });
 
@@ -109,8 +124,29 @@ describe('PmscanController', () => {
       const expectedResult = { message: 'PMScan supprimé avec succès' };
       jest.spyOn(service, 'remove').mockResolvedValue(expectedResult);
 
-      expect(await controller.remove(id)).toBe(expectedResult);
-      expect(service.remove).toHaveBeenCalledWith(1);
+      expect(await controller.remove(id, user)).toBe(expectedResult);
+      expect(service.remove).toHaveBeenCalledWith(1, user.id);
+    });
+  });
+
+  describe('findAllFromUser', () => {
+    it('should find all pmscans for a user', async () => {
+      const expectedResult = [
+        {
+          id: 1,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          display: Buffer.from('test'),
+          name: 'Test PMScan',
+          deviceId: 'FF:9C:95:3E:A9:F9',
+          deviceName: 'PMScan123456',
+          userId: 1,
+        },
+      ];
+      jest.spyOn(service, 'findAllFromUser').mockResolvedValue(expectedResult);
+
+      expect(await controller.findAllFromUser(user)).toBe(expectedResult);
+      expect(service.findAllFromUser).toHaveBeenCalledWith(user.id);
     });
   });
 });
