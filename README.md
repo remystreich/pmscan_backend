@@ -22,64 +22,98 @@
   <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
   [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
 
+# PMScan Backend
+
 ## Description
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+PMScan Backend is an API for the PMScan project.
 
-## Project setup
+## Prerequisites
 
-```bash
-$ npm install
-```
+- Docker
+- Docker Compose
+- Make (optional, for using Makefile commands)
 
-## Compile and run the project
+## Configuration
 
-```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
-```
-
-## Run tests
+1. Copy the `.env.example` file to `.env` and fill in the necessary environment variables:
 
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+cp .env.example .env
 ```
 
-## Resources
+2. Modify the `.env` file with your own values for:
+   - `POSTGRES_USER`
+   - `POSTGRES_PASSWORD`
+   - `POSTGRES_DB`
+   - `REDIS_PASSWORD`
+   - `REDIS_HOST`
+   - `REDIS_PORT`
+   - `PORT`
+   - `JWT_SECRET`
+   - `NODE_ENV`
 
-Check out a few resources that may come in handy when working with NestJS:
+## Starting the project
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+To start the project, run:
 
-## Support
+```bash
+docker-compose up --build -d
+```
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+The application will be accessible at `http://localhost:3000`.
 
-## Stay in touch
+## Useful commands
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+Voici quelques commandes utiles définies dans le Makefile :
 
-## License
+- Restart the containers:
+  ```
+  make restart
+  ```
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+- Launch Prisma Studio:
+  ```
+  make studio
+  ```
+
+- Create a new Prisma migration:
+  ```
+  make migrate name=nom_de_la_migration
+  ```
+
+- Run the tests:
+  ```
+  make tests
+  ```
+
+- Create the test database:
+  ```
+  make create-test-db
+  ```
+
+- Apply the migrations to the test database:
+  ```
+  make migrate-test-db
+  ```
+
+- Make a commit (run the tests before committing):
+  ```
+  make commit c="commit message"
+  ```
+
+## Project structure
+
+The project uses Docker Compose to orchestrate the following services:
+
+- `app` : The NestJS application
+- `postgres` : PostgreSQL database
+- `redis` : Redis server for caching
+
+## Développement
+
+The source code of the application is mounted as a volume in the `app` container, allowing hot reloading during development.
+
+## Tests
+
+The tests are executed in an isolated Docker environment. Make sure to have created the test database before running the tests.

@@ -69,23 +69,28 @@ describe('RecordsService', () => {
 
   describe('create', () => {
     it('should create a record', async () => {
-      const createRecordDto = { data: 'dGVzdA==' };
+      const createRecordDto = { data: 'dGVzdA==', name: 'Test Record' };
       const pmScanId = 1;
+      const userId = 1;
+      const testPmScan = createTestPmScan(userId);
       const expectedRecord = {
         id: 1,
         data: Buffer.from('test'),
         pmScanId,
-        name: '',
+        name: 'Test Record',
         createdAt: new Date(),
         updatedAt: new Date(),
       };
 
+      pmscanService.findOne.mockResolvedValue(testPmScan);
       recordsRepository.create.mockResolvedValue(expectedRecord);
 
-      const result = await service.create(createRecordDto, pmScanId);
+      const result = await service.create(createRecordDto, pmScanId, userId);
 
+      expect(pmscanService.findOne).toHaveBeenCalledWith(pmScanId, userId);
       expect(recordsRepository.create).toHaveBeenCalledWith({
         data: Buffer.from('test'),
+        name: 'Test Record',
         pmScan: { connect: { id: pmScanId } },
       });
       expect(result).toEqual(expectedRecord);

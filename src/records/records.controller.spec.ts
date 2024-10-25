@@ -66,10 +66,18 @@ describe('RecordsController', () => {
     it('should create a record', async () => {
       jest.spyOn(service, 'create').mockResolvedValue(mockRecord);
 
-      const result = await controller.create(mockCreateRecordDto, '1');
+      const result = await controller.create(
+        mockCreateRecordDto,
+        '1',
+        mockUser,
+      );
 
       expect(result).toEqual(mockRecord);
-      expect(service.create).toHaveBeenCalledWith(mockCreateRecordDto, 1);
+      expect(service.create).toHaveBeenCalledWith(
+        mockCreateRecordDto,
+        1,
+        mockUser.id,
+      );
     });
 
     it('should update the name of a record', async () => {

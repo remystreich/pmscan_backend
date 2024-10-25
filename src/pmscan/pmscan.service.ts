@@ -22,7 +22,7 @@ export class PmscanService {
       throw new NotFoundException('User not found');
     }
     return this.pmscanRepository.create({
-      name: createPmscanDto.name,
+      name: createPmscanDto.name || createPmscanDto.deviceName,
       deviceId: createPmscanDto.deviceId,
       deviceName: createPmscanDto.deviceName,
       display: Buffer.from(createPmscanDto.display, 'base64'),
