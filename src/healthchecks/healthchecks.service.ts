@@ -1,18 +1,14 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { Cache } from 'cache-manager';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import { PrismaService } from './prisma/prisma.service';
+import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
-export class AppService {
+export class HealthchecksService {
   constructor(
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
     private prisma: PrismaService,
   ) {}
-
-  getHello(): string {
-    return 'Hello World!';
-  }
 
   async getStatus(): Promise<{
     status: string;
