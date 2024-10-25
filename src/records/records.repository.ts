@@ -19,8 +19,21 @@ export class RecordsRepository {
     return this.prisma.record.findMany();
   }
 
-  async findAllFromPmScan(pmScanId: number): Promise<Record[]> {
-    return this.prisma.record.findMany({ where: { pmScanId } });
+  async findAllFromPmScan(
+    pmScanId: number,
+    skip: number,
+    take: number,
+  ): Promise<{ records: Record[]; total: number }> {
+    const [records, total] = await Promise.all([
+      this.prisma.record.findMany({
+        where: { pmScanId },
+        skip,
+        take,
+      }),
+      this.prisma.record.count({ where: { pmScanId } }),
+    ]);
+
+    return { records, total };
   }
 
   async findOne(id: number): Promise<Record | null> {

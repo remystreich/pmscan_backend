@@ -39,6 +39,7 @@ describe('RecordsService', () => {
       create: jest.fn(),
       update: jest.fn(),
       delete: jest.fn(),
+      findAllFromPmScan: jest.fn(),
     };
 
     const mockPmscanService = {
@@ -157,6 +158,68 @@ describe('RecordsService', () => {
       await expect(service.remove(testRecordId, testUserId)).rejects.toThrow(
         ForbiddenException,
       );
+    });
+  });
+
+  describe('findAllFromPMScan', () => {
+    it('should return paginated records from a pmscan', async () => {
+      const expectedRecords = [createTestRecord(), createTestRecord()];
+      const totalRecords = 10;
+      recordsRepository.findAllFromPmScan.mockResolvedValue({
+        records: expectedRecords,
+        total: totalRecords,
+      });
+
+      const page = 1;
+      const limit = 2;
+      const result = await service.findAllFromPmScan(
+        testPmScanId,
+        testUserId,
+        page,
+        limit,
+      );
+
+      expect(pmscanService.findOne).toHaveBeenCalledWith(
+        testPmScanId,
+        testUserId,
+      );
+      expect(recordsRepository.findAllFromPmScan).toHaveBeenCalledWith(
+        testPmScanId,
+        0, // skip
+        limit,
+      );
+      expect(result).toEqual({
+        records: expectedRecords,
+        meta: {
+          total: totalRecords,
+          page,
+          limit,
+          totalPages: 5,
+        },
+      });
+    });
+
+    it('should use default values for page and limit if not provided', async () => {
+      recordsRepository.findAllFromPmScan.mockResolvedValue({
+        records: [],
+        total: 0,
+      });
+
+      await service.findAllFromPmScan(testPmScanId, testUserId);
+
+      expect(recordsRepository.findAllFromPmScan).toHaveBeenCalledWith(
+        testPmScanId,
+        0, // skip (page 1)
+        10, // default limit
+      );
+    });
+
+    it('should throw ForbiddenException if user does not own the pmscan', async () => {
+      pmscanService.findOne.mockResolvedValue(null);
+
+      await expect(
+        service.findAllFromPmScan(testPmScanId, testUserId),
+      ).rejects.toThrow(ForbiddenException);
     });
   });
 });

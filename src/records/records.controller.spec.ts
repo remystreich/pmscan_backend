@@ -22,6 +22,7 @@ describe('RecordsController', () => {
             create: jest.fn(),
             updateName: jest.fn(),
             remove: jest.fn(),
+            findAllFromPmScan: jest.fn(),
           },
         },
       ],
@@ -65,13 +66,10 @@ describe('RecordsController', () => {
     it('should create a record', async () => {
       jest.spyOn(service, 'create').mockResolvedValue(mockRecord);
 
-      const result = await controller.create(mockCreateRecordDto, mockUser);
+      const result = await controller.create(mockCreateRecordDto, '1');
 
       expect(result).toEqual(mockRecord);
-      expect(service.create).toHaveBeenCalledWith(
-        mockCreateRecordDto,
-        mockUser.id,
-      );
+      expect(service.create).toHaveBeenCalledWith(mockCreateRecordDto, 1);
     });
 
     it('should update the name of a record', async () => {
@@ -100,6 +98,39 @@ describe('RecordsController', () => {
 
       expect(result).toEqual(deleteResult);
       expect(service.remove).toHaveBeenCalledWith(1, mockUser.id);
+    });
+
+    it('should get all records from a pmscan', async () => {
+      const mockPmScanId = '1';
+      const mockPage = 1;
+      const mockLimit = 10;
+      const mockRecords = [mockRecord, { ...mockRecord, id: 2 }];
+      const mockResponse = {
+        records: mockRecords,
+        meta: {
+          total: 2,
+          page: mockPage,
+          limit: mockLimit,
+          totalPages: 1,
+        },
+      };
+
+      jest.spyOn(service, 'findAllFromPmScan').mockResolvedValue(mockResponse);
+
+      const result = await controller.findAllFromPmScan(
+        mockPmScanId,
+        mockUser,
+        mockPage,
+        mockLimit,
+      );
+
+      expect(result).toEqual(mockResponse);
+      expect(service.findAllFromPmScan).toHaveBeenCalledWith(
+        +mockPmScanId,
+        mockUser.id,
+        mockPage,
+        mockLimit,
+      );
     });
   });
 });

@@ -52,4 +52,35 @@ export class RecordsService {
     await this.recordsRepository.delete(id);
     return { message: 'Record deleted successfully' };
   }
+
+  async findAllFromPmScan(
+    pmScanId: number,
+    userId: number,
+    page: number = 1,
+    limit: number = 10,
+  ) {
+    const pmScan = await this.pmScansService.findOne(pmScanId, userId);
+    if (!pmScan) {
+      throw new ForbiddenException(
+        'You are not allowed to access these records',
+      );
+    }
+
+    const skip = (page - 1) * limit;
+    const { records, total } = await this.recordsRepository.findAllFromPmScan(
+      pmScanId,
+      skip,
+      limit,
+    );
+
+    return {
+      records,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
+  }
 }
