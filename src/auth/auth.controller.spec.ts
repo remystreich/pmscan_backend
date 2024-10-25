@@ -110,4 +110,16 @@ describe('AuthController', () => {
         .expect(401);
     });
   });
+
+  describe('requestResetPassword', () => {
+    it('/auth/request-reset-password (POST) - should send a reset password email', async () => {
+      const requestResetPasswordDto = { email: 'test@example.com' };
+      const response = await request(app.getHttpServer())
+        .post('/auth/request-reset-password')
+        .send(requestResetPasswordDto)
+        .expect(200);
+      expect(response.body).toHaveProperty('message');
+      expect(response.body.message).toBe('Email sent');
+    });
+  });
 });

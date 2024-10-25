@@ -87,6 +87,13 @@ jobs:
           JWT_SECRET: 0602d6b5abc49a2a7d65c2739dfdad2f966c5fe71754d8d741940f71331cb4320602d6b5abc49a2a7d65c2739dfdad2f966c5fe71754d8d741940f71331cb432
         run: npm run test
 
+      - name: Upload test report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-report
+          path: test-report.html
+
       # (Optionnel) Étape 8: Nettoyer la base de données après les tests
       - name: Drop test database
         run: |
