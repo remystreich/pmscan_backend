@@ -42,11 +42,11 @@ jobs:
     steps:
       # Étape 1: Checker le code
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       # Étape 2: Installer Node.js
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: 20.17
 
@@ -94,7 +94,28 @@ jobs:
           name: test-report
           path: test-report.html
 
-      # (Optionnel) Étape 8: Nettoyer la base de données après les tests
+      # Étape 8: Nettoyer la base de données après les tests
       - name: Drop test database
         run: |
           PGPASSWORD=mypassword psql -h localhost -U myuser -d mydatabase -c "DROP DATABASE IF EXISTS testdb;"
+  
+  codeql-analysis:
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v2
+        with:
+          languages: 'javascript,typescript'
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
+        with:
+          output: sarif  # génère un rapport au format SARIF pour GitHub Security

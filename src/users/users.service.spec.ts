@@ -54,7 +54,7 @@ describe('UsersService', () => {
     expect(service).toBeDefined();
   });
 
-  describe('CRUD operations', () => {
+  describe('create', () => {
     it('should create a user', async () => {
       mockUsersRepository.create.mockResolvedValue(mockUser);
 
@@ -71,7 +71,9 @@ describe('UsersService', () => {
       });
       expect(bcrypt.hash).toHaveBeenCalledWith(mockCreateUserDto.password, 10);
     });
+  });
 
+  describe('findAll', () => {
     it('should return all users without passwords', async () => {
       const users = [
         mockUser,
@@ -85,7 +87,9 @@ describe('UsersService', () => {
       expect(result).toEqual(users.map(({ password, ...user }) => user));
       expect(mockUsersRepository.findAll).toHaveBeenCalled();
     });
+  });
 
+  describe('findOne', () => {
     it('should return a user by ID without password', async () => {
       mockUsersRepository.findOne.mockResolvedValue(mockUser);
 
@@ -98,7 +102,9 @@ describe('UsersService', () => {
       });
       expect(mockUsersRepository.findOne).toHaveBeenCalledWith(mockUser.id);
     });
+  });
 
+  describe('findOneByEmail', () => {
     it('should return a user by email without password', async () => {
       mockUsersRepository.findOneByEmail.mockResolvedValue(mockUser);
 
@@ -113,7 +119,9 @@ describe('UsersService', () => {
         mockUser.email,
       );
     });
+  });
 
+  describe('update', () => {
     it('should update a user', async () => {
       const updateUserDto: UpdateUserDto = {
         name: 'Updated User',
@@ -139,7 +147,9 @@ describe('UsersService', () => {
       });
       expect(bcrypt.hash).toHaveBeenCalledWith('newPassword', 10);
     });
+  });
 
+  describe('remove', () => {
     it('should delete a user', async () => {
       mockUsersRepository.delete.mockResolvedValue({
         id: mockUser.id,

@@ -62,7 +62,7 @@ describe('RecordsController', () => {
     expect(controller).toBeDefined();
   });
 
-  describe('CRUD operations', () => {
+  describe('create', () => {
     it('should create a record', async () => {
       jest.spyOn(service, 'create').mockResolvedValue(mockRecord);
 
@@ -79,7 +79,9 @@ describe('RecordsController', () => {
         mockUser.id,
       );
     });
+  });
 
+  describe('updateName', () => {
     it('should update the name of a record', async () => {
       const updatedRecord = { ...mockRecord, name: 'Updated Record Name' };
       jest.spyOn(service, 'updateName').mockResolvedValue(updatedRecord);
@@ -97,7 +99,9 @@ describe('RecordsController', () => {
         mockUser.id,
       );
     });
+  });
 
+  describe('remove', () => {
     it('should delete a record', async () => {
       const deleteResult = { message: 'Record deleted successfully' };
       jest.spyOn(service, 'remove').mockResolvedValue(deleteResult);

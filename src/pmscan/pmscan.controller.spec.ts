@@ -60,7 +60,7 @@ describe('PmscanController', () => {
     expect(controller).toBeDefined();
   });
 
-  describe('CRUD operations', () => {
+  describe('create', () => {
     it('should create a pmscan', async () => {
       const createPmscanDto: CreatePmscanDto = {
         name: 'Test PMScan',
@@ -74,7 +74,9 @@ describe('PmscanController', () => {
       expect(result).toEqual(mockPmscan);
       expect(service.create).toHaveBeenCalledWith(createPmscanDto, mockUser.id);
     });
+  });
 
+  describe('findOne', () => {
     it('should find a pmscan by id', async () => {
       jest.spyOn(service, 'findOne').mockResolvedValue(mockPmscan);
 
@@ -82,7 +84,9 @@ describe('PmscanController', () => {
       expect(result).toEqual(mockPmscan);
       expect(service.findOne).toHaveBeenCalledWith(1, mockUser.id);
     });
+  });
 
+  describe('update', () => {
     it('should update a pmscan', async () => {
       const updatePmscanDto: UpdatePmscanDto = { name: 'Updated PMScan' };
       const updatedMockPmscan = { ...mockPmscan, name: 'Updated PMScan' };
@@ -96,7 +100,9 @@ describe('PmscanController', () => {
         mockUser.id,
       );
     });
+  });
 
+  describe('remove', () => {
     it('should remove a pmscan', async () => {
       const expectedResult = { message: 'PMScan supprimé avec succès' };
       jest.spyOn(service, 'remove').mockResolvedValue(expectedResult);
@@ -105,7 +111,9 @@ describe('PmscanController', () => {
       expect(result).toEqual(expectedResult);
       expect(service.remove).toHaveBeenCalledWith(1, mockUser.id);
     });
+  });
 
+  describe('findAllFromUser', () => {
     it('should find all pmscans for a user', async () => {
       jest.spyOn(service, 'findAllFromUser').mockResolvedValue([mockPmscan]);
 
