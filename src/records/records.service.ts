@@ -23,9 +23,19 @@ export class RecordsService {
     }
   }
 
-  async create(createRecordDto: CreateRecordDto, pmScanId: number) {
+  async create(
+    createRecordDto: CreateRecordDto,
+    pmScanId: number,
+    userId: number,
+  ) {
+    const pmScan = await this.pmScansService.findOne(pmScanId, userId);
+    if (!pmScan) {
+      throw new NotFoundException('PMScan not found');
+    }
+    const nameDefault = `${pmScan.name}-${new Date().toISOString()}`;
     const record = {
       data: Buffer.from(createRecordDto.data, 'base64'),
+      name: createRecordDto.name || nameDefault,
       pmScan: { connect: { id: pmScanId } },
     };
     return this.recordsRepository.create(record);
@@ -82,5 +92,21 @@ export class RecordsService {
         totalPages: Math.ceil(total / limit),
       },
     };
+  }
+
+  async appendData(id: number, newData: string, userId: number) {
+    const record = await this.findOne(id);
+    if (!record) {
+      throw new NotFoundException('Record not found');
+    }
+    await this.checkOwnership(userId, record);
+
+    const newDataBuffer = Buffer.from(newData, 'base64');
+    const updatedData = Buffer.concat([record.data, newDataBuffer]);
+    const updatedRecord = {
+      data: updatedData,
+    };
+
+    return this.recordsRepository.update(id, updatedRecord);
   }
 }

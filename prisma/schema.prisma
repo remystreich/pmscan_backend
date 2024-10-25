@@ -48,4 +48,6 @@ model Record {
 
   pmScanId Int
   pmScan    PMScan @relation(fields: [pmScanId], references: [id])
+
+  @@index([pmScanId])
 }

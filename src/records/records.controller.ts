@@ -36,8 +36,9 @@ export class RecordsController {
   create(
     @Body() createRecordDto: CreateRecordDto,
     @Param('pmScanId') pmScanId: string,
+    @CurrentUser() user: User,
   ) {
-    return this.recordsService.create(createRecordDto, +pmScanId);
+    return this.recordsService.create(createRecordDto, +pmScanId, user.id);
   }
 
   @Patch('update-record-name/:id')
@@ -94,5 +95,16 @@ export class RecordsController {
       page,
       limit,
     );
+  }
+
+  @Patch('/append-data/:id')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  appendData(
+    @Param('id') id: string,
+    @Body() updateRecordDto: UpdateRecordDto,
+    @CurrentUser() user: User,
+  ) {
+    return this.recordsService.appendData(+id, updateRecordDto.data, user.id);
   }
 }

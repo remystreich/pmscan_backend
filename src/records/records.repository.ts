@@ -10,6 +10,7 @@ export class RecordsRepository {
     return this.prisma.record.create({
       data: {
         data: data.data,
+        name: data.name,
         pmScan: { connect: { id: data.pmScan.connect.id } },
       },
     });
