@@ -11,6 +11,9 @@ import { RecordsModule } from './records/records.module';
 import { HealthchecksModule } from './healthchecks/healthchecks.module';
 import { EmailModule } from './email/email.module';
 import { ResetPasswordTokensModule } from './reset-password-tokens/reset-password-tokens.module';
+import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -37,6 +40,18 @@ import { ResetPasswordTokensModule } from './reset-password-tokens/reset-passwor
     HealthchecksModule,
     EmailModule,
     ResetPasswordTokensModule,
+    ThrottlerModule.forRoot([
+      {
+        ttl: 60000,
+        limit: 10,
+      },
+    ]),
+  ],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
   ],
 })
 export class AppModule {}
