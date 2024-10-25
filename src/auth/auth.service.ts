@@ -6,6 +6,8 @@ import { LoginDto } from './dto/login.dto';
 import { UsersRepository } from '../users/users.repository';
 import * as crypto from 'crypto';
 import { RefreshTokensService } from '../refresh-tokens/refresh-tokens.service';
+import { EmailService } from '../email/email.service';
+import { ResetPasswordTokensService } from '../reset-password-tokens/reset-password-tokens.service';
 
 @Injectable()
 export class AuthService {
@@ -13,7 +15,32 @@ export class AuthService {
     private jwtService: JwtService,
     private usersRepository: UsersRepository,
     private refreshTokensService: RefreshTokensService,
+    private emailService: EmailService,
+    private resetPasswordTokensService: ResetPasswordTokensService,
   ) {}
+
+  private generateAccessToken(user: any): string {
+    const payload = { email: user.email, sub: user.id };
+    return this.jwtService.sign(payload, { expiresIn: '15m' });
+  }
+
+  private generateRefreshToken(user: any): string {
+    const tokenId = crypto.randomBytes(16).toString('hex'); // Génère un identifiant unique
+    const payload = { sub: user.id, jti: tokenId };
+    return this.jwtService.sign(payload, { expiresIn: '10d' });
+  }
+
+  private generateResetPasswordToken(userId: number): {
+    token: string;
+    tokenId: string;
+  } {
+    const tokenId = crypto.randomBytes(16).toString('hex');
+    const payload = { userId: userId, jti: tokenId };
+    return {
+      token: this.jwtService.sign(payload, { expiresIn: '1h' }),
+      tokenId,
+    };
+  }
 
   async validateUser(email: string, pass: string): Promise<any> {
     const user = await this.usersRepository.findOneByEmail(email);
@@ -44,17 +71,6 @@ export class AuthService {
       access_token: accessToken,
       refresh_token: refreshToken,
     };
-  }
-
-  private generateAccessToken(user: any): string {
-    const payload = { email: user.email, sub: user.id };
-    return this.jwtService.sign(payload, { expiresIn: '15m' });
-  }
-
-  private generateRefreshToken(user: any): string {
-    const tokenId = crypto.randomBytes(16).toString('hex'); // Génère un identifiant unique
-    const payload = { sub: user.id, jti: tokenId };
-    return this.jwtService.sign(payload, { expiresIn: '10d' });
   }
 
   async refreshAccessToken(
@@ -99,5 +115,27 @@ export class AuthService {
     } catch (error) {
       console.error('Erreur lors de la déconnexion', error);
     }
+  }
+
+  async sendResetPasswordEmail(email: string) {
+    const user = await this.usersRepository.findOneByEmail(email);
+    if (!user) {
+      throw new UnauthorizedException('Utilisateur non trouvé');
+    }
+    const { token, tokenId } = this.generateResetPasswordToken(user.id);
+    const resetUrl = `http://localhost:3000/reset-password?token=${token}`;
+    const text = `Click on this link to reset your password: ${resetUrl}`;
+    await this.emailService.sendEmail(
+      'noreply@pmscan.com',
+      email,
+      'Reset your password',
+      text,
+    );
+    await this.resetPasswordTokensService.storeResetPasswordToken(
+      tokenId,
+      user.id,
+      token,
+    );
+    return { message: 'Email sent' };
   }
 }

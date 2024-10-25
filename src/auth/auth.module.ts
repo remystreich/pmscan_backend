@@ -8,6 +8,8 @@ import { JwtStrategy } from './jwt.strategy';
 import { UsersModule } from '../users/users.module';
 import { ConfigService } from '@nestjs/config';
 import { RefreshTokensModule } from '../refresh-tokens/refresh-tokens.module';
+import { EmailModule } from '../email/email.module';
+import { ResetPasswordTokensModule } from '../reset-password-tokens/reset-password-tokens.module';
 @Module({
   imports: [
     UsersModule,
@@ -21,6 +23,8 @@ import { RefreshTokensModule } from '../refresh-tokens/refresh-tokens.module';
     }),
     AuthModule,
     RefreshTokensModule,
+    EmailModule,
+    ResetPasswordTokensModule,
   ],
   providers: [AuthService, JwtStrategy],
   controllers: [AuthController],

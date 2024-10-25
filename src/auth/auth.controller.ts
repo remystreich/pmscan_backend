@@ -14,6 +14,7 @@ import {
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
+import { RequestPasswordDto } from './dto/requestPasswordDTO.dto';
 import { UsersService } from '../users/users.service';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Response, Request } from 'express';
@@ -97,5 +98,18 @@ export class AuthController {
     });
 
     return { message: 'Déconnexion réussie' };
+  }
+
+  @Post('request-reset-password')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Ask for a reset password email' })
+  @ApiResponse({ status: 200, description: 'Reset password email sent' })
+  @ApiResponse({ status: 401, description: 'User not found' })
+  async requestResetPassword(
+    @Body() requestResetPasswordDto: RequestPasswordDto,
+  ) {
+    return this.authService.sendResetPasswordEmail(
+      requestResetPasswordDto.email,
+    );
   }
 }
