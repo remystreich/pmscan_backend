@@ -118,24 +118,35 @@ export class AuthService {
   }
 
   async sendResetPasswordEmail(email: string) {
+    const genericResponse = { message: 'Email sent' };
     const user = await this.usersRepository.findOneByEmail(email);
     if (!user) {
-      throw new UnauthorizedException('Utilisateur non trouvé');
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      return genericResponse;
     }
-    const { token, tokenId } = this.generateResetPasswordToken(user.id);
-    const resetUrl = `http://localhost:3000/reset-password?token=${token}`;
-    const text = `Click on this link to reset your password: ${resetUrl}`;
-    await this.emailService.sendEmail(
-      'noreply@pmscan.com',
-      email,
-      'Reset your password',
-      text,
-    );
-    await this.resetPasswordTokensService.storeResetPasswordToken(
-      tokenId,
-      user.id,
-      token,
-    );
-    return { message: 'Email sent' };
+    try {
+      const { token, tokenId } = this.generateResetPasswordToken(user.id);
+      const resetUrl = `http://localhost:3000/reset-password?token=${token}`;
+      const text = `Click on this link to reset your password: ${resetUrl}`;
+
+      await Promise.all([
+        this.emailService.sendEmail(
+          'noreply@pmscan.com',
+          email,
+          'Reset your password',
+          text,
+        ),
+        this.resetPasswordTokensService.storeResetPasswordToken(
+          tokenId,
+          user.id,
+          token,
+        ),
+      ]);
+
+      return genericResponse;
+    } catch (error) {
+      console.error('Error sending reset password email:', error);
+      return genericResponse;
+    }
   }
 }
