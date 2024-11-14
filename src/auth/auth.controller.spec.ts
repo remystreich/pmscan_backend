@@ -122,4 +122,5 @@ describe('AuthController', () => {
       expect(response.body.message).toBe('Email sent');
     });
   });
+
 });

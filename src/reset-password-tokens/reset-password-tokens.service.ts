@@ -8,7 +8,7 @@ export class ResetPasswordTokensService {
     private resetPasswordTokensRepository: ResetPasswordTokensRepository,
   ) {}
 
-  private hashToken(token: string): string {
+  public hashToken(token: string): string {
     return crypto.createHash('sha256').update(token).digest('hex');
   }
 
@@ -21,7 +21,7 @@ export class ResetPasswordTokensService {
     await this.resetPasswordTokensRepository.storeToken(
       `reset_password_token:${tokenId}`,
       { userId, token: hashedToken },
-      60 * 60, // 1 heure en secondes
+      60 * 60 * 1000, // 1 heure
     );
   }
 

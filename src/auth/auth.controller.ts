@@ -18,6 +18,7 @@ import { RequestPasswordDto } from './dto/requestPasswordDTO.dto';
 import { UsersService } from '../users/users.service';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Response, Request } from 'express';
+import { ResetPasswordDto } from './dto/resetPassword.dto';
 
 @Controller('auth')
 @ApiTags('Auth')
@@ -104,12 +105,19 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Ask for a reset password email' })
   @ApiResponse({ status: 200, description: 'Reset password email sent' })
-  @ApiResponse({ status: 401, description: 'User not found' })
   async requestResetPassword(
     @Body() requestResetPasswordDto: RequestPasswordDto,
   ) {
     return this.authService.sendResetPasswordEmail(
       requestResetPasswordDto.email,
     );
+  }
+
+  @Post('reset-password')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Reset password' })
+  @ApiResponse({ status: 200, description: 'Password reset' })
+  async resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
+    return this.authService.resetPassword(resetPasswordDto);
   }
 }
