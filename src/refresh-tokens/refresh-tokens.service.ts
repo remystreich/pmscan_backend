@@ -15,7 +15,7 @@ export class RefreshTokensService {
     await this.refreshTokensRepository.storeToken(
       `refresh_token:${tokenId}`,
       { userId, token: hashedToken },
-      10 * 24 * 60 * 60, // 10 jours en secondes
+      10 * 24 * 60 * 60 * 1000, // 10 jours ms
     );
   }
 

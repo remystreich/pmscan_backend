@@ -8,6 +8,7 @@ import * as crypto from 'crypto';
 import { RefreshTokensService } from '../refresh-tokens/refresh-tokens.service';
 import { EmailService } from '../email/email.service';
 import { ResetPasswordTokensService } from '../reset-password-tokens/reset-password-tokens.service';
+import { ResetPasswordDto } from './dto/resetPassword.dto';
 
 @Injectable()
 export class AuthService {
@@ -125,8 +126,9 @@ export class AuthService {
       return genericResponse;
     }
     try {
+      const baseUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
       const { token, tokenId } = this.generateResetPasswordToken(user.id);
-      const resetUrl = `http://localhost:3000/reset-password?token=${token}`;
+      const resetUrl = `${baseUrl}/reset-password?token=${token}`;
       const text = `Click on this link to reset your password: ${resetUrl}`;
 
       await Promise.all([
@@ -147,6 +149,55 @@ export class AuthService {
     } catch (error) {
       console.error('Error sending reset password email:', error);
       return genericResponse;
+    }
+  }
+
+  async resetPassword(resetPasswordDto: ResetPasswordDto) {
+    const resetToken = resetPasswordDto.resetToken;
+    const newPassword = resetPasswordDto.password;
+
+    try {
+      const payload = this.jwtService.verify(resetToken);
+      const tokenId = payload.jti;
+      const userId = payload.userId;
+
+      const storedData =
+        await this.resetPasswordTokensService.getResetPasswordTokenData(
+          tokenId,
+        );
+
+      if (!storedData) {
+        throw new UnauthorizedException(
+          'Expired or invalid reset password token',
+        );
+      }
+
+      const hashedToken = this.resetPasswordTokensService.hashToken(resetToken);
+      if (storedData.token !== hashedToken) {
+        throw new UnauthorizedException('Invalid reset password token');
+      }
+
+      // Mettre à jour le mot de passe de l'utilisateur
+      const user = await this.usersRepository.findOne(userId);
+      if (!user) {
+        throw new UnauthorizedException('User not found');
+      }
+
+      user.password = await bcrypt.hash(newPassword, 10);
+      await this.usersRepository.update(userId, user);
+
+      // Supprimer le token de réinitialisation après utilisation
+      await this.resetPasswordTokensService.deleteResetPasswordToken(tokenId);
+
+      return { message: 'Password updated with success' };
+    } catch (error) {
+      console.error(
+        'Erreur lors de la réinitialisation du mot de passe:',
+        error,
+      );
+      throw new UnauthorizedException(
+        'Reset password token expired or invalid',
+      );
     }
   }
 }
