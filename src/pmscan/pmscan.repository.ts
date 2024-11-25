@@ -37,4 +37,11 @@ export class PmscanRepository {
   async delete(id: number): Promise<PMScan> {
     return this.prisma.pMScan.delete({ where: { id } });
   }
+
+  async findOneByDeviceIdFromUser(
+    deviceId: string,
+    userId: number,
+  ): Promise<PMScan | null> {
+    return this.prisma.pMScan.findFirst({ where: { deviceId, userId } });
+  }
 }
