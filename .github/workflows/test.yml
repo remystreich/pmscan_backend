@@ -22,9 +22,9 @@ jobs:
         ports:
           - 5432:5432
         options: >-
-          --health-cmd="pg_isready -U myuser" 
-          --health-interval=10s 
-          --health-timeout=5s 
+          --health-cmd="pg_isready -U myuser"
+          --health-interval=10s
+          --health-timeout=5s
           --health-retries=5
 
       redis:
@@ -98,7 +98,7 @@ jobs:
       - name: Drop test database
         run: |
           PGPASSWORD=mypassword psql -h localhost -U myuser -d mydatabase -c "DROP DATABASE IF EXISTS testdb;"
-  
+
   codeql-analysis:
     runs-on: ubuntu-latest
     permissions:
@@ -118,4 +118,4 @@ jobs:
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3
         with:
-          output: sarif  # génère un rapport au format SARIF pour GitHub Security
+          output: sarif # génère un rapport au format SARIF pour GitHub Security

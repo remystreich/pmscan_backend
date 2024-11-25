@@ -21,6 +21,14 @@ export class PmscanService {
     if (!user) {
       throw new NotFoundException('User not found');
     }
+    const existingPmscan =
+      await this.pmscanRepository.findOneByDeviceIdFromUser(
+        createPmscanDto.deviceId,
+        userId,
+      );
+    if (existingPmscan) {
+      throw new ForbiddenException('PMScan already exists');
+    }
     return this.pmscanRepository.create({
       name: createPmscanDto.name || createPmscanDto.deviceName,
       deviceId: createPmscanDto.deviceId,
