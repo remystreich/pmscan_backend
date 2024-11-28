@@ -14,7 +14,7 @@ studio:
 	docker-compose exec app sh -c "npx prisma studio --port 5555"
 
 migrate:
-	docker-compose exec app sh -c "npx prisma migrate dev --name $(name)"
+	docker-compose exec app sh -c "npx prisma migrate dev --name $(name) && npx prisma generate"
 
 tests:
 	docker-compose exec -e DATABASE_URL="postgresql://myuser:mypassword@postgres:5432/testdb" app sh -c "npx prisma migrate deploy && npm run test"

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Test, TestingModule } from '@nestjs/testing';
 import { PmscanService } from './pmscan.service';
 import { PmscanRepository } from './pmscan.repository';
@@ -12,6 +13,7 @@ describe('PmscanService', () => {
   let usersService: UsersService;
   let mockUser: User;
   let mockCreatePmscanDto: CreatePmscanDto;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   let mockCreatedPmscan: PMScan;
 
   beforeEach(async () => {
