@@ -11,18 +11,6 @@ export class CreatePmscanDto {
   name: string;
 
   @ApiProperty({
-    description: 'The device id of the pmscan',
-    example: 'FF:9C:95:3E:A9:F9',
-  })
-  @IsNotEmpty()
-  @IsString()
-  @Matches(/^([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}$/, {
-    message:
-      'deviceId must be in the format XX:XX:XX:XX:XX:XX where X is a hexadecimal digit',
-  })
-  deviceId: string;
-
-  @ApiProperty({
     description: 'The device name of the pmscan',
     example: 'PMScan136476',
   })

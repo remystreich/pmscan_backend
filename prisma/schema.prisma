@@ -29,7 +29,6 @@ model PMScan {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
   name       String?
-  deviceId   String
   deviceName String
   display    Bytes
 
