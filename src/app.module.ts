@@ -42,7 +42,7 @@ import { APP_GUARD } from '@nestjs/core';
     ResetPasswordTokensModule,
     ThrottlerModule.forRoot([
       {
-        ttl: 60000,
+        ttl: 60,
         limit: 10,
       },
     ]),

@@ -14,7 +14,7 @@ datasource db {
 }
 
 model User {
-  id        Int      @default(autoincrement()) @id
+  id        Int      @id @default(autoincrement())
   email     String   @unique
   name      String?
   password  String
@@ -25,29 +25,29 @@ model User {
 }
 
 model PMScan {
-  id        Int      @default(autoincrement()) @id
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  name      String? 
-  deviceId  String
+  id         Int      @id @default(autoincrement())
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  name       String?
+  deviceId   String
   deviceName String
-  display Bytes
+  display    Bytes
 
-  userId    Int
-  user      User     @relation(fields: [userId], references: [id])
+  userId Int
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   records Record[]
 }
 
 model Record {
-  id        Int      @default(autoincrement()) @id
+  id        Int      @id @default(autoincrement())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   data      Bytes
   name      String?
 
   pmScanId Int
-  pmScan    PMScan @relation(fields: [pmScanId], references: [id])
+  pmScan   PMScan @relation(fields: [pmScanId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   @@index([pmScanId])
 }
