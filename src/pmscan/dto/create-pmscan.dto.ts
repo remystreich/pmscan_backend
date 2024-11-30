@@ -16,8 +16,9 @@ export class CreatePmscanDto {
   })
   @IsNotEmpty()
   @IsString()
-  @Matches(/^PMScan\d{6}$/, {
-    message: 'deviceName must start with "PMScan" followed by 6 digits',
+  @Matches(/^PMScan[A-Za-z0-9]{6}$/, {
+    message:
+      'deviceName must start with "PMScan" followed by 6 alphanumeric characters',
   })
   deviceName: string;
 
