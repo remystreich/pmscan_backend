@@ -22,8 +22,8 @@ export class PmscanService {
       throw new NotFoundException('User not found');
     }
     const existingPmscan =
-      await this.pmscanRepository.findOneByDeviceIdFromUser(
-        createPmscanDto.deviceId,
+      await this.pmscanRepository.findOneByDeviceNameFromUser(
+        createPmscanDto.deviceName,
         userId,
       );
     if (existingPmscan) {
@@ -31,7 +31,6 @@ export class PmscanService {
     }
     return this.pmscanRepository.create({
       name: createPmscanDto.name || createPmscanDto.deviceName,
-      deviceId: createPmscanDto.deviceId,
       deviceName: createPmscanDto.deviceName,
       display: Buffer.from(createPmscanDto.display, 'base64'),
       user: { connect: { id: userId } },
@@ -66,9 +65,6 @@ export class PmscanService {
 
     if (updatePmscanDto.name !== undefined) {
       updateData.name = updatePmscanDto.name;
-    }
-    if (updatePmscanDto.deviceId !== undefined) {
-      updateData.deviceId = updatePmscanDto.deviceId;
     }
     if (updatePmscanDto.deviceName !== undefined) {
       updateData.deviceName = updatePmscanDto.deviceName;

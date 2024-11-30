@@ -50,7 +50,6 @@ describe('PmscanController', () => {
       updatedAt: new Date(),
       display: Buffer.from('test'),
       name: 'Test PMScan',
-      deviceId: 'FF:9C:95:3E:A9:F9',
       deviceName: 'PMScan123456',
       userId: 1,
     };
@@ -64,7 +63,6 @@ describe('PmscanController', () => {
     it('should create a pmscan', async () => {
       const createPmscanDto: CreatePmscanDto = {
         name: 'Test PMScan',
-        deviceId: 'FF:9C:95:3E:A9:F9',
         deviceName: 'PMScan123456',
         display: 'base64encodedstring',
       };

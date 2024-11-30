@@ -10,7 +10,6 @@ export class PmscanRepository {
     return this.prisma.pMScan.create({
       data: {
         name: data.name,
-        deviceId: data.deviceId,
         deviceName: data.deviceName,
         display: data.display,
         user: { connect: { id: data.user.connect.id } },
@@ -38,10 +37,10 @@ export class PmscanRepository {
     return this.prisma.pMScan.delete({ where: { id } });
   }
 
-  async findOneByDeviceIdFromUser(
-    deviceId: string,
+  async findOneByDeviceNameFromUser(
+    deviceName: string,
     userId: number,
   ): Promise<PMScan | null> {
-    return this.prisma.pMScan.findFirst({ where: { deviceId, userId } });
+    return this.prisma.pMScan.findFirst({ where: { deviceName, userId } });
   }
 }
