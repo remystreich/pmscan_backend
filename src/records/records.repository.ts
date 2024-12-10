@@ -13,6 +13,7 @@ export class RecordsRepository {
         data: data.data,
         name: data.name,
         pmScan: { connect: { id: data.pmScan.connect.id } },
+        type: data.type,
       },
     });
   }
