@@ -168,7 +168,10 @@ describe('RecordsService', () => {
 
   describe('findAllFromPMScan', () => {
     it('should return paginated records from a pmscan', async () => {
-      const expectedRecords = [createTestRecord(), createTestRecord()];
+      const expectedRecords = [
+        { ...createTestRecord(), measuresCount: 50, data: undefined },
+        { ...createTestRecord(), measuresCount: 50, data: undefined },
+      ];
       const totalRecords = 10;
       recordsRepository.findAllFromPmScan.mockResolvedValue({
         records: expectedRecords,
