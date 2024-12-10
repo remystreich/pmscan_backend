@@ -20,6 +20,7 @@ describe('RecordsService', () => {
     name: '',
     createdAt: new Date(),
     updatedAt: new Date(),
+    type: 'online',
   });
 
   const createTestPmScan = (userId = testUserId) => ({
@@ -69,7 +70,11 @@ describe('RecordsService', () => {
 
   describe('create', () => {
     it('should create a record', async () => {
-      const createRecordDto = { data: 'dGVzdA==', name: 'Test Record' };
+      const createRecordDto = {
+        data: 'dGVzdA==',
+        name: 'Test Record',
+        type: 'online',
+      };
       const pmScanId = 1;
       const userId = 1;
       const testPmScan = createTestPmScan(userId);
@@ -80,6 +85,7 @@ describe('RecordsService', () => {
         name: 'Test Record',
         createdAt: new Date(),
         updatedAt: new Date(),
+        type: 'online',
       };
 
       pmscanService.findOne.mockResolvedValue(testPmScan);

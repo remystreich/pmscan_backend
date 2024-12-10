@@ -46,6 +46,7 @@ describe('RecordsController', () => {
     mockCreateRecordDto = {
       data: 'base64encodedstring',
       name: 'Test Record',
+      type: 'Datalogger record',
     };
 
     mockRecord = {
@@ -55,6 +56,7 @@ describe('RecordsController', () => {
       data: Buffer.from(mockCreateRecordDto.data, 'base64'),
       name: mockCreateRecordDto.name,
       pmScanId: 1,
+      type: mockCreateRecordDto.type,
     };
   });
 

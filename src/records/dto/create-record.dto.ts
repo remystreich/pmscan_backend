@@ -18,4 +18,11 @@ export class CreateRecordDto {
   @IsOptional()
   @IsString()
   name?: string;
+
+  @ApiProperty({
+    description: 'The type of the record',
+    example: 'Datalogger record',
+  })
+  @IsString()
+  type: string;
 }
