@@ -44,6 +44,7 @@ model Record {
   updatedAt DateTime @updatedAt
   data      Bytes
   name      String?
+  type      String @default("online")
 
   pmScanId Int
   pmScan   PMScan @relation(fields: [pmScanId], references: [id], onDelete: Cascade, onUpdate: Cascade)

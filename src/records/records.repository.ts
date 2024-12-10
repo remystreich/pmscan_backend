@@ -40,6 +40,7 @@ export class RecordsRepository {
             createdAt: true,
             updatedAt: true,
             data: true,
+            type: true,
           },
           skip,
           take,
