@@ -100,11 +100,32 @@ export class RecordsController {
   @Patch('/append-data/:id')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
+  @ApiOperation({ summary: 'Append data to a record' })
+  @ApiResponse({ status: 200, description: 'Data appended' })
+  @ApiResponse({ status: 404, description: 'Record not found' })
+  @ApiResponse({
+    status: 403,
+    description: 'You are not allowed to access this record',
+  })
   appendData(
     @Param('id') id: string,
     @Body() updateRecordDto: UpdateRecordDto,
     @CurrentUser() user: User,
   ) {
     return this.recordsService.appendData(+id, updateRecordDto.data, user.id);
+  }
+
+  @Get('/single/:id')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Get a record by id' })
+  @ApiResponse({ status: 200, description: 'Record found' })
+  @ApiResponse({ status: 404, description: 'Record not found' })
+  @ApiResponse({
+    status: 403,
+    description: 'You are not allowed to access this record',
+  })
+  findOne(@Param('id') id: number, @CurrentUser() user: User) {
+    return this.recordsService.findOne(id, user.id);
   }
 }
