@@ -50,7 +50,7 @@ export class PmscanService {
     if (!pmscan) {
       throw new NotFoundException('PMScan not found');
     }
-    this.checkUserOwnership(pmscan, userId);
+    await this.checkUserOwnership(pmscan, userId);
     return pmscan;
   }
 
@@ -59,7 +59,7 @@ export class PmscanService {
     if (!existingPmscan) {
       throw new NotFoundException('PMScan not found');
     }
-    this.checkUserOwnership(existingPmscan, userId);
+    await this.checkUserOwnership(existingPmscan, userId);
 
     const updateData: Prisma.PMScanUpdateInput = {};
 
@@ -81,7 +81,7 @@ export class PmscanService {
     if (!existingPmscan) {
       throw new NotFoundException('PMScan non trouvé');
     }
-    this.checkUserOwnership(existingPmscan, userId);
+    await this.checkUserOwnership(existingPmscan, userId);
     await this.pmscanRepository.delete(id);
     return { message: 'PMScan supprimé avec succès' };
   }

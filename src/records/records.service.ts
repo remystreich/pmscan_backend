@@ -12,8 +12,13 @@ export class RecordsService {
     private readonly pmScansService: PmscanService,
   ) {}
 
-  private async findOne(id: number) {
-    return this.recordsRepository.findOne(id);
+  async findOne(id: number, userId: number) {
+    const record = await this.recordsRepository.findOne(id);
+    if (!record) {
+      throw new NotFoundException('Record not found');
+    }
+    await this.checkOwnership(userId, record);
+    return record;
   }
 
   private async checkOwnership(userId: number, record: Record) {
@@ -42,7 +47,7 @@ export class RecordsService {
   }
 
   async updateName(id: number, name: string, userId: number) {
-    const record = await this.findOne(id);
+    const record = await this.recordsRepository.findOne(id);
     if (!record) {
       throw new NotFoundException('Record not found');
     }
@@ -54,7 +59,7 @@ export class RecordsService {
   }
 
   async remove(id: number, userId: number) {
-    const record = await this.findOne(id);
+    const record = await this.recordsRepository.findOne(id);
     if (!record) {
       throw new NotFoundException('Record not found');
     }
@@ -83,6 +88,10 @@ export class RecordsService {
       limit,
     );
 
+    // records.forEach((record) => {
+    //   this.checkOwnership(userId, record);
+    // });
+
     return {
       records,
       meta: {
@@ -95,7 +104,7 @@ export class RecordsService {
   }
 
   async appendData(id: number, newData: string, userId: number) {
-    const record = await this.findOne(id);
+    const record = await this.recordsRepository.findOne(id);
     if (!record) {
       throw new NotFoundException('Record not found');
     }
