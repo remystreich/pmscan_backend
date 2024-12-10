@@ -2,6 +2,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { Injectable } from '@nestjs/common';
 import { Prisma, Record } from '@prisma/client';
 
+type RecordData = Omit<Record, 'data'> & { measuresCount: number };
 @Injectable()
 export class RecordsRepository {
   constructor(private prisma: PrismaService) {}
@@ -24,13 +25,32 @@ export class RecordsRepository {
     pmScanId: number,
     skip: number,
     take: number,
-  ): Promise<{ records: Record[]; total: number }> {
+  ): Promise<{
+    records: RecordData[];
+    total: number;
+  }> {
     const [records, total] = await Promise.all([
-      this.prisma.record.findMany({
-        where: { pmScanId },
-        skip,
-        take,
-      }),
+      this.prisma.record
+        .findMany({
+          where: { pmScanId },
+          select: {
+            id: true,
+            name: true,
+            pmScanId: true,
+            createdAt: true,
+            updatedAt: true,
+            data: true,
+          },
+          skip,
+          take,
+        })
+        .then((records) =>
+          records.map((record) => ({
+            ...record,
+            measuresCount: record.data.length / 20,
+            data: undefined,
+          })),
+        ),
       this.prisma.record.count({ where: { pmScanId } }),
     ]);
 

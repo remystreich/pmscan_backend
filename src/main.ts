@@ -5,9 +5,14 @@ import { ValidationPipe } from '@nestjs/common';
 import { useContainer } from 'class-validator';
 import * as cookieParser from 'cookie-parser';
 import helmet from 'helmet';
+import * as express from 'express';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  app.use(express.json({ limit: '180kb' }));
+  app.use(express.urlencoded({ limit: '150kb', extended: true }));
+
   app.enableCors({
     credentials: true,
     origin: ['http://localhost:5173', 'https://remy-streich.ri7.tech'],

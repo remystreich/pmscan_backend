@@ -116,7 +116,10 @@ describe('RecordsController', () => {
       const mockPmScanId = '1';
       const mockPage = 1;
       const mockLimit = 10;
-      const mockRecords = [mockRecord, { ...mockRecord, id: 2 }];
+      const mockRecords = [
+        { ...mockRecord, measuresCount: 50, data: undefined },
+        { ...mockRecord, id: 2, measuresCount: 50, data: undefined },
+      ];
       const mockResponse = {
         records: mockRecords,
         meta: {
