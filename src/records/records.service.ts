@@ -37,11 +37,12 @@ export class RecordsService {
     if (!pmScan) {
       throw new NotFoundException('PMScan not found');
     }
-    const nameDefault = `${pmScan.name}-${new Date().toISOString()}`;
+    const nameDefault = `${pmScan.name}_${new Date().toISOString().split('.')[0]}`;
     const record = {
       data: Buffer.from(createRecordDto.data, 'base64'),
       name: createRecordDto.name || nameDefault,
       pmScan: { connect: { id: pmScanId } },
+      type: createRecordDto.type,
     };
     return this.recordsRepository.create(record);
   }

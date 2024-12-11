@@ -98,6 +98,7 @@ describe('RecordsService', () => {
         data: Buffer.from('test'),
         name: 'Test Record',
         pmScan: { connect: { id: pmScanId } },
+        type: 'online',
       });
       expect(result).toEqual(expectedRecord);
     });
