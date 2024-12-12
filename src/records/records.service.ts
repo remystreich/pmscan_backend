@@ -4,6 +4,14 @@ import { RecordsRepository } from './records.repository';
 import { ForbiddenException } from '@nestjs/common';
 import { Record } from '@prisma/client';
 import { PmscanService } from '../pmscan/pmscan.service';
+import * as fastcsv from 'fast-csv';
+import * as fs from 'fs';
+import * as path from 'path';
+
+interface ExportResult {
+  filePath: string;
+  fileName: string;
+}
 
 @Injectable()
 export class RecordsService {
@@ -18,6 +26,7 @@ export class RecordsService {
       throw new NotFoundException('Record not found');
     }
     await this.checkOwnership(userId, record);
+    console.log(record);
     return record;
   }
 
@@ -118,5 +127,63 @@ export class RecordsService {
     };
 
     return this.recordsRepository.update(id, updatedRecord);
+  }
+
+  async exportToCsv(id: number, userId: number) {
+    const record = await this.findOne(id, userId);
+
+    const fileName = `${record.name}.csv`;
+    const filePath = path.join(process.cwd(), 'exports', fileName);
+    if (!fs.existsSync('exports')) {
+      fs.mkdirSync('exports');
+    }
+
+    const parsedData = this.parseBuffer(record.data);
+    return new Promise<ExportResult>((resolve, reject) => {
+      fastcsv
+        .writeToPath(filePath, parsedData, { headers: true })
+        .on('error', (error) => {
+          reject(error);
+        })
+        .on('finish', () => {
+          resolve({ filePath, fileName });
+        });
+    });
+  }
+
+  private parseBuffer(data: Buffer): any[] {
+    const dt2000 = 946684800;
+    const recordSize = 20;
+    const parsedRecords = [];
+
+    for (let i = 0; i < data.length; i += recordSize) {
+      const rawData = data.subarray(i, i + recordSize);
+
+      if (rawData.length < recordSize) break;
+
+      const ts2000 =
+        ((rawData[3] & 0xff) << 24) |
+        ((rawData[2] & 0xff) << 16) |
+        ((rawData[1] & 0xff) << 8) |
+        (rawData[0] & 0xff);
+      const measuredAt = new Date((ts2000 + dt2000) * 1000);
+
+      const record = {
+        timestamp: ts2000 + dt2000,
+        measuredAt: measuredAt.toISOString(),
+        status: rawData[4],
+        command: rawData[5],
+        pm10pl: (((rawData[7] & 0xff) << 8) | (rawData[6] & 0xff)) / 10,
+        pm1gm: (((rawData[9] & 0xff) << 8) | (rawData[8] & 0xff)) / 10,
+        pm25gm: (((rawData[11] & 0xff) << 8) | (rawData[10] & 0xff)) / 10,
+        pm10gm: (((rawData[13] & 0xff) << 8) | (rawData[12] & 0xff)) / 10,
+        temperature: (((rawData[15] & 0xff) << 8) | (rawData[14] & 0xff)) / 10,
+        humidity: (((rawData[17] & 0xff) << 8) | (rawData[16] & 0xff)) / 10,
+      };
+
+      parsedRecords.push(record);
+    }
+
+    return parsedRecords;
   }
 }
