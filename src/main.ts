@@ -17,6 +17,7 @@ async function bootstrap() {
     credentials: true,
     origin: ['http://localhost:5173', 'https://remy-streich.ri7.tech'],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    exposedHeaders: ['Content-Disposition'],
   });
   app.use(cookieParser());
   app.use(helmet());
