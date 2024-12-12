@@ -8,6 +8,10 @@ import {
   UseGuards,
   Get,
   Query,
+  Req,
+  Res,
+  HttpException,
+  HttpStatus,
 } from '@nestjs/common';
 import { RecordsService } from './records.service';
 import { CreateRecordDto } from './dto/create-record.dto';
@@ -21,6 +25,7 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import * as fs from 'fs';
 
 @ApiTags('Records')
 @Controller('records')
@@ -127,5 +132,49 @@ export class RecordsController {
   })
   findOne(@Param('id') id: number, @CurrentUser() user: User) {
     return this.recordsService.findOne(id, user.id);
+  }
+
+  @Get('/toCSV/:id')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Export a record in CSV' })
+  @ApiResponse({ status: 200, description: 'CSV created' })
+  @ApiResponse({ status: 404, description: 'Record not found' })
+  @ApiResponse({
+    status: 403,
+    description: 'You are not allowed to access this record',
+  })
+  async toCSV(
+    @Param('id') id: number,
+    @CurrentUser() user: User,
+    @Req() req,
+    @Res() res,
+  ) {
+    try {
+      const { filePath, fileName } = await this.recordsService.exportToCsv(
+        id,
+        req.user.id,
+      );
+
+      res.set({
+        'Content-Type': 'text/csv',
+        'Content-Disposition': `attachment; filename="${fileName}"`,
+      });
+
+      // Envoyer le fichier en stream
+      const fileStream = fs.createReadStream(filePath);
+      fileStream.pipe(res);
+
+      // Nettoyer le fichier après l'envoi
+      fileStream.on('end', () => {
+        fs.unlinkSync(filePath);
+      });
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (error) {
+      throw new HttpException(
+        "Erreur lors de l'export",
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 }
