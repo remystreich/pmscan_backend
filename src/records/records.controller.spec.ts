@@ -118,6 +118,7 @@ describe('RecordsController', () => {
       const mockPmScanId = '1';
       const mockPage = 1;
       const mockLimit = 10;
+      const mockDate = '2021-01-01';
       const mockRecords = [
         { ...mockRecord, measuresCount: 50, data: undefined },
         { ...mockRecord, id: 2, measuresCount: 50, data: undefined },
@@ -139,6 +140,7 @@ describe('RecordsController', () => {
         mockUser,
         mockPage,
         mockLimit,
+        mockDate,
       );
 
       expect(result).toEqual(mockResponse);
@@ -147,6 +149,7 @@ describe('RecordsController', () => {
         mockUser.id,
         mockPage,
         mockLimit,
+        mockDate,
       );
     });
   });

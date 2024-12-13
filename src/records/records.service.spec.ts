@@ -187,11 +187,13 @@ describe('RecordsService', () => {
 
       const page = 1;
       const limit = 2;
+      const date = '2021-01-01';
       const result = await service.findAllFromPmScan(
         testPmScanId,
         testUserId,
         page,
         limit,
+        date,
       );
 
       expect(pmscanService.findOne).toHaveBeenCalledWith(
@@ -202,6 +204,7 @@ describe('RecordsService', () => {
         testPmScanId,
         0, // skip
         limit,
+        new Date(date),
       );
       expect(result).toEqual({
         records: expectedRecords,
@@ -214,7 +217,7 @@ describe('RecordsService', () => {
       });
     });
 
-    it('should use default values for page and limit if not provided', async () => {
+    it('should use default values for page, limit and dates if not provided', async () => {
       recordsRepository.findAllFromPmScan.mockResolvedValue({
         records: [],
         total: 0,
@@ -226,6 +229,7 @@ describe('RecordsService', () => {
         testPmScanId,
         0, // skip (page 1)
         10, // default limit
+        undefined,
       );
     });
 
