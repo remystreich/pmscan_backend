@@ -83,6 +83,7 @@ export class RecordsService {
     userId: number,
     page: number = 1,
     limit: number = 10,
+    date?: string,
   ) {
     const pmScan = await this.pmScansService.findOne(pmScanId, userId);
     if (!pmScan) {
@@ -90,12 +91,14 @@ export class RecordsService {
         'You are not allowed to access these records',
       );
     }
+    const dateParam = date ? new Date(date) : undefined;
 
     const skip = (page - 1) * limit;
     const { records, total } = await this.recordsRepository.findAllFromPmScan(
       pmScanId,
       skip,
       limit,
+      dateParam,
     );
 
     // records.forEach((record) => {
@@ -185,5 +188,10 @@ export class RecordsService {
     }
 
     return parsedRecords;
+  }
+
+  async getDistinctDatesForUser(userId: number) {
+    const dates = await this.recordsRepository.findDistinctDatesForUser(userId);
+    return { dates };
   }
 }

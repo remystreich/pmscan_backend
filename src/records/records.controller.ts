@@ -93,12 +93,14 @@ export class RecordsController {
     @CurrentUser() user: User,
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 10,
+    @Query('date') date?: string,
   ) {
     return this.recordsService.findAllFromPmScan(
       +pmScanId,
       user.id,
       page,
       limit,
+      date,
     );
   }
 
@@ -176,5 +178,14 @@ export class RecordsController {
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
+  }
+
+  @Get('dates/all')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Get all dates with records for current user' })
+  @ApiResponse({ status: 200, description: 'Dates found' })
+  getDistinctDatesForUser(@CurrentUser() user: User) {
+    return this.recordsService.getDistinctDatesForUser(user.id);
   }
 }

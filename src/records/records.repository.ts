@@ -26,14 +26,25 @@ export class RecordsRepository {
     pmScanId: number,
     skip: number,
     take: number,
+    date?: Date,
   ): Promise<{
     records: RecordData[];
     total: number;
   }> {
+    const where = {
+      pmScanId,
+      ...(date && {
+        createdAt: {
+          // Filtre pour obtenir les records de la journée spécifiée
+          gte: date,
+          lt: new Date(date.getTime() + 24 * 60 * 60 * 1000),
+        },
+      }),
+    };
     const [records, total] = await Promise.all([
       this.prisma.record
         .findMany({
-          where: { pmScanId },
+          where,
           select: {
             id: true,
             name: true,
@@ -69,5 +80,36 @@ export class RecordsRepository {
 
   async delete(id: number): Promise<Record> {
     return this.prisma.record.delete({ where: { id } });
+  }
+
+  async findDistinctDatesForUser(userId: number): Promise<Date[]> {
+    const records = await this.prisma.record.findMany({
+      where: {
+        pmScan: {
+          userId: userId,
+        },
+      },
+      select: {
+        createdAt: true,
+      },
+      distinct: ['createdAt'],
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+
+    // Créer un Set pour dédupliquer les dates
+    const uniqueDates = new Set(
+      records.map((record) => {
+        const date = new Date(record.createdAt);
+        date.setHours(0, 0, 0, 0);
+        return date.toISOString().split('T')[0]; // Convertir en format YYYY-MM-DD
+      }),
+    );
+
+    // Convertir le Set en tableau de dates triées
+    return Array.from(uniqueDates)
+      .map((dateStr) => new Date(dateStr))
+      .sort((a, b) => b.getTime() - a.getTime()); // Tri décroissant
   }
 }
